@@ -6,8 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // Relacionamento com Menu
       Item.belongsTo(models.Menu, {
-        foreignKey: "category_id",
-        as: "category",
+        foreignKey: "menu_id",
+        as: "menu",
       });
 
       // Relacionamento com Orders (via tabela intermediária)
@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       price: DataTypes.DECIMAL,
       available: DataTypes.BOOLEAN,
-      category_id: DataTypes.INTEGER,
+      menu_id: DataTypes.INTEGER,
     },
     {
       sequelize,

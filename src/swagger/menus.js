@@ -4,7 +4,7 @@
  *   get:
  *     summary: Retorna o cardápio completo do estabelecimento.
  *     tags:
- *       - Cardápio
+ *       - Cardápio - Menus
  *     responses:
  *       200:
  *         description: Lista de categorias e itens.
@@ -15,10 +15,10 @@
  *               items:
  *                 type: object
  *                 properties:
- *                   category_id:
+ *                   menu_id:
  *                     type: integer
  *                     example: 1
- *                   category_name:
+ *                   menu_name:
  *                     type: string
  *                     example: Bebidas
  *                   items:
@@ -43,9 +43,9 @@
  * @swagger
  * /menu:
  *   post:
- *     summary: Adiciona um novo item ao cardápio.
+ *     summary: Adiciona um novo menu ao cardápio.
  *     tags:
- *       - Cardápio
+ *       - Cardápio - Menus
  *     requestBody:
  *       required: true
  *       content:
@@ -53,35 +53,26 @@
  *           schema:
  *             type: object
  *             properties:
- *               category_id:
- *                 type: integer
- *                 example: 1
- *               name:
+ *               menu_name:
  *                 type: string
- *                 example: Coca-Cola
- *               price:
- *                 type: number
- *                 example: 5.99
- *               available:
- *                 type: boolean
- *                 example: true
+ *                 example: Bebidas
  *     responses:
  *       201:
- *         description: Item adicionado com sucesso.
+ *         description: Menu adicionado com sucesso.
  */
 
 /**
  * @swagger
- * /menu/{item_id}:
+ * /menu/{menu_id}:
  *   put:
- *     summary: Atualiza informações de um item do cardápio.
+ *     summary: Atualiza informações de um menu do cardápio.
  *     tags:
- *       - Cardápio
+ *       - Cardápio - Menus
  *     parameters:
- *       - name: item_id
+ *       - name: menu_id
  *         in: path
  *         required: true
- *         description: ID do item a ser atualizado.
+ *         description: ID do menu a ser atualizado.
  *         schema:
  *           type: integer
  *     requestBody:
@@ -91,37 +82,28 @@
  *           schema:
  *             type: object
  *             properties:
- *               category_id:
- *                 type: integer
- *                 example: 1
- *               name:
+ *               menu_name:
  *                 type: string
- *                 example: Coca-Cola
- *               price:
- *                 type: number
- *                 example: 5.99
- *               available:
- *                 type: boolean
- *                 example: true
+ *                 example: Bebidas
  *     responses:
  *       200:
- *         description: Item atualizado com sucesso.
+ *         description: Menu atualizado com sucesso.
  */
 /**
  * @swagger
- * /menu/{item_id}:
+ * /menu/{menu_id}:
  *   delete:
- *     summary: Remove um item do cardápio.
+ *     summary: Remove um menu do cardápio.
  *     tags:
- *       - Cardápio
+ *       - Cardápio - Menus
  *     parameters:
- *       - name: item_id
+ *       - name: menu_id
  *         in: path
  *         required: true
- *         description: ID do item a ser removido.
+ *         description: ID do menu a ser removido.
  *         schema:
  *           type: integer
  *     responses:
  *       200:
- *         description: Item removido com sucesso.
+ *         description: Menu removido com sucesso.
  */

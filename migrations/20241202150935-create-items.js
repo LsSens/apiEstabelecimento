@@ -19,11 +19,11 @@ module.exports = {
         allowNull: false,
         defaultValue: true,
       },
-      category_id: {
+      menu_id: {
         type: Sequelize.INTEGER,
         references: {
           model: "menu",
-          key: "category_id",
+          key: "menu_id",
         },
         onUpdate: "CASCADE",
         onDelete: "SET NULL",

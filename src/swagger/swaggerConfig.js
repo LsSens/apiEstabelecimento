@@ -14,6 +14,20 @@ const swaggerOptions = {
         description: "Servidor Local",
       },
     ],
+    components: {
+      securitySchemes: {
+        Authorization: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        Authorization: [],
+      },
+    ],
   },
   apis: ["./src/swagger/*.js"],
 };

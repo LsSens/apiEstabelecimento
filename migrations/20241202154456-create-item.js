@@ -18,7 +18,7 @@ module.exports = {
       available: {
         type: Sequelize.BOOLEAN
       },
-      category_id: {
+      menu_id: {
         type: Sequelize.INTEGER
       },
       createdAt: {
