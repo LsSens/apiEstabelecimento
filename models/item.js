@@ -1,5 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class Item extends Model {
     static associate(models) {
@@ -11,12 +12,13 @@ module.exports = (sequelize, DataTypes) => {
 
       // Relacionamento com Orders (via tabela intermediária)
       Item.belongsToMany(models.Order, {
-        through: models.OrderItem,
+        through: models.OrderItem, // Especificar a tabela intermediária
         foreignKey: "item_id",
         as: "orders",
       });
     }
   }
+
   Item.init(
     {
       name: DataTypes.STRING,
@@ -26,8 +28,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "item",
+      modelName: "Item",
+      tableName: "items",
     }
   );
+
   return Item;
 };

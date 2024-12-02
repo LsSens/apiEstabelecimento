@@ -1,30 +1,34 @@
 "use strict";
 const { Model } = require("sequelize");
-module.exports = (sequelize, DataTypes) => {
-  class Menus extends Model {
-    static associate(models) {
-      // Relacionamento com Company
-      s.belongsTo(models.Company, {
-        foreignKey: "company_id",
-        as: "company",
-      });
 
+module.exports = (sequelize, DataTypes) => {
+  class Menu extends Model {
+    static associate(models) {
       // Relacionamento com Items
-      Menus.hasMany(models.Item, {
+      Menu.hasMany(models.Item, {
         foreignKey: "category_id",
         as: "items",
       });
+
+      // Relacionamento com Company
+      Menu.belongsTo(models.Company, {
+        foreignKey: "company_id",
+        as: "company",
+      });
     }
   }
-  Menus.init(
+
+  Menu.init(
     {
       category_name: DataTypes.STRING,
       company_id: DataTypes.INTEGER,
     },
     {
       sequelize,
-      modelName: "menus",
+      modelName: "Menu",
+      tableName: "menus",
     }
   );
-  return Menus;
+
+  return Menu;
 };

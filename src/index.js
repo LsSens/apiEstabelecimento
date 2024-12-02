@@ -6,14 +6,15 @@ const authRoutes = require("./routes/auth");
 
 const app = express();
 
+// Middleware básico
+app.use(express.json());
+
 // Configurar as rotas
 app.use("/auth", authRoutes);
 
 // Configuração do Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Middleware básico
-app.use(express.json());
 
 // Inicialização do servidor
 app.listen(3000, () => {

@@ -5,7 +5,7 @@ const { User, Company } = require("@models");
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
-  const { email, password, name, phone, companyName, companyCNPJ } = req.body;
+  const { email, password, name, phone, company } = req.body;
 
   try {
     // Verificar se o e-mail já está em uso
@@ -13,10 +13,12 @@ router.post("/register", async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ error: "E-mail já está em uso." });
     }
+
     // Criar a empresa
     const newCompany = await Company.create({
-      name: companyName,
-      cnpj: companyCNPJ,
+      name: company.name,
+      cnpj: company.cnpj,
+      address: company.address,
     });
 
     // Criptografar a senha
@@ -33,7 +35,14 @@ router.post("/register", async (req, res) => {
 
     res.status(201).json({
       message: "Usuário e empresa criados com sucesso.",
-      user: newUser,
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name,
+        phone: newUser.phone,
+        company_id: newUser.company_id,
+      },
+      company: newCompany,
     });
   } catch (error) {
     console.error(error);
@@ -62,12 +71,17 @@ router.post("/login", async (req, res) => {
       {
         user_id: user.id,
         company_id: user.company_id,
+        permissions: user.permissions,
       },
       process.env.JWT_SECRET || "secret_key",
-      { expiresIn: "1h" }
+      { expiresIn: "10h" }
     );
 
-    res.status(200).json({ token });
+    res.status(200).json({
+      token,
+      permissions: user.permissions,
+      message: "Login realizado com sucesso.",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erro ao fazer login." });
