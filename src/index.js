@@ -1,29 +1,15 @@
+require("module-alias/register");
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
-const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerDocs = require("./swagger/swaggerConfig");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 
-// Configuração do Swagger
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Delivery API",
-      version: "1.0.0",
-      description: "API de delivery no padrão Open Delivery.",
-    },
-    servers: [
-      {
-        url: "http://localhost:3000",
-        description: "Servidor Local",
-      },
-    ],
-  },
-  apis: ["./src/swagger/*.js"],
-};
+// Configurar as rotas
+app.use("/auth", authRoutes);
 
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
+// Configuração do Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Middleware básico

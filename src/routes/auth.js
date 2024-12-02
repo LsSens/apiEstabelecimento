@@ -1,11 +1,11 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User } = require("../models");
+const { User, Company } = require("@models");
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
-  const { email, password, name, phone, company } = req.body;
+  const { email, password, name, phone, companyName, companyCNPJ } = req.body;
 
   try {
     // Verificar se o e-mail já está em uso
@@ -13,31 +13,27 @@ router.post("/register", async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ error: "E-mail já está em uso." });
     }
-
     // Criar a empresa
     const newCompany = await Company.create({
-      name: company.name,
-      cnpj: company.cnpj,
-      address: company.address,
+      name: companyName,
+      cnpj: companyCNPJ,
     });
 
     // Criptografar a senha
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Criar o usuário vinculado à empresa
-    const user = await User.create({
+    // Criar o usuário associado à empresa
+    const newUser = await User.create({
       email,
       password: hashedPassword,
       name,
       phone,
       company_id: newCompany.id,
-      permission: "admin", // Define a permissão como 'admin'
     });
 
     res.status(201).json({
-      message: "Usuário e empresa registrados com sucesso.",
-      user,
-      company: newCompany,
+      message: "Usuário e empresa criados com sucesso.",
+      user: newUser,
     });
   } catch (error) {
     console.error(error);
