@@ -1,5 +1,5 @@
 const express = require("express");
-const { Menu, Item } = require("@models");
+const { Menus, Item } = require("@models");
 const authenticateToken = require("../middlewares/authenticateToken");
 const router = express.Router();
 
@@ -9,7 +9,7 @@ router.get("/:menu_id/item/:item_id", authenticateToken, async (req, res) => {
 
   try {
     // Verificar se o menu existe
-    const menu = await Menu.findOne({ where: { id: menu_id } });
+    const menu = await Menus.findOne({ where: { id: menu_id } });
 
     if (!menu) {
       return res.status(404).json({ error: "Menu não encontrado." });
@@ -44,7 +44,7 @@ router.post("/:menu_id/items", authenticateToken, async (req, res) => {
   const { company_id } = req.user;
 
   try {
-    const menu = await Menu.findOne({ where: { id: menu_id } });
+    const menu = await Menus.findOne({ where: { id: menu_id } });
 
     if (!menu) {
       return res.status(404).json({ error: "Menu não encontrado." });
@@ -105,7 +105,7 @@ router.put("/:menu_id/item/:item_id", authenticateToken, async (req, res) => {
 
   try {
     // Verificar se o menu existe
-    const menu = await Menu.findOne({ where: { id: menu_id } });
+    const menu = await Menus.findOne({ where: { id: menu_id } });
 
     if (!menu) {
       return res.status(404).json({ error: "Menu não encontrado." });
@@ -153,7 +153,7 @@ router.delete(
 
     try {
       // Verificar se o menu existe
-      const menu = await Menu.findOne({ where: { id: menu_id } });
+      const menu = await Menus.findOne({ where: { id: menu_id } });
 
       if (!menu) {
         return res.status(404).json({ error: "Menu não encontrado." });

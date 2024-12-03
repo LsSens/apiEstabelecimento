@@ -5,9 +5,9 @@ module.exports = (sequelize, DataTypes) => {
   class Item extends Model {
     static associate(models) {
       // Relacionamento com Menu
-      Item.belongsTo(models.Menu, {
+      Item.belongsTo(models.Menus, {
         foreignKey: "menu_id",
-        as: "menu",
+        as: "menus",
       });
 
       // Relacionamento com Orders (via tabela intermediária)

@@ -22,8 +22,8 @@ module.exports = {
       menu_id: {
         type: Sequelize.INTEGER,
         references: {
-          model: "menu",
-          key: "menu_id",
+          model: "menus",
+          key: "id",
         },
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
