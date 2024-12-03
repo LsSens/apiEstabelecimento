@@ -14,7 +14,7 @@
  *             properties:
  *               email:
  *                 type: string
- *                 example: user@example.com
+ *                 example: admin@company.com
  *               password:
  *                 type: string
  *                 example: senha123

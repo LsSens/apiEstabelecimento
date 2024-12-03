@@ -1,5 +1,63 @@
 /**
  * @swagger
+ * /menu/{menu_id}/item/{item_id}:
+ *   get:
+ *     summary: Item do menu.
+ *     tags:
+ *       - Cardápio - Items
+ *     parameters:
+ *       - name: menu_id
+ *         in: path
+ *         required: true
+ *         description: ID do menu.
+ *         schema:
+ *           type: integer
+ *       - name: item_id
+ *         in: path
+ *         required: true
+ *         description: ID do item no menu.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Dados do item.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 7
+ *                 name:
+ *                   type: string
+ *                   example: Coca-Cola
+ *                 price:
+ *                   type: string
+ *                   example: "5.99"
+ *                 available:
+ *                   type: boolean
+ *                   example: true
+ *                 menu_id:
+ *                   type: integer
+ *                   example: 2
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-12-02T17:46:12.296Z"
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-12-02T17:46:12.296Z"
+ *       403:
+ *         description: Permissão negada.
+ *       404:
+ *         description: Menu ou item não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+/**
+ * @swagger
  * /menu/{menu_id}/items:
  *   post:
  *     summary: Adiciona um novo item ao menu.

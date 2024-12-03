@@ -37,6 +37,50 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { company_id } = req.user;
+
+  try {
+    const menu = await Menu.findOne({
+      where: { id },
+      include: [
+        {
+          model: Item,
+          as: "items",
+          attributes: ["id", "name", "price", "available"],
+        },
+      ],
+    });
+
+    if (!menu) {
+      return res.status(404).json({ error: "Menu não encontrado." });
+    }
+
+    // Verificar se o menu pertence ao mesmo company_id do usuário autenticado
+    if (menu.company_id !== company_id) {
+      return res.status(403).json({ error: "Menu não encontrado." });
+    }
+
+    // Formatar a resposta
+    const formattedMenus = ({
+      menu_id: menu.id,
+      menu_name: menu.menu_name,
+      items: menu.items.map((item) => ({
+        item_id: item.id,
+        name: item.name,
+        price: item.price,
+        available: item.available,
+      })),
+    });
+
+    res.status(200).json(formattedMenus);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao atualizar o menu." });
+  }
+});
+
 router.post("/", authenticateToken, async (req, res) => {
   const { menu_name } = req.body;
 
