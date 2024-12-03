@@ -1,4 +1,3 @@
-require("module-alias/register");
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocs = require("./swagger/swaggerConfig");
