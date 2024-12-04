@@ -66,6 +66,9 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "E-mail ou senha inválidos." });
     }
 
+    // Tempo de expiração do token
+    const expiresIn = 60 * 60 * 1;
+
     // Gerar o token JWT
     const token = jwt.sign(
       {
@@ -73,12 +76,13 @@ router.post("/login", async (req, res) => {
         company_id: user.company_id,
         permissions: user.permissions,
       },
-      process.env.JWT_SECRET || "secret_key",
-      { expiresIn: "10h" }
+      process.env.JWT_SECRET,
+      { expiresIn }
     );
 
     res.status(200).json({
       token,
+      expiresIn,
       permissions: user.permissions,
       message: "Login realizado com sucesso.",
     });

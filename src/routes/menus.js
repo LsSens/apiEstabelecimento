@@ -1,6 +1,7 @@
 const express = require("express");
 const { Menus, Item } = require("../../models");
 const authenticateToken = require("../middlewares/authenticateToken");
+const uploadToImgur = require("../images/imgur");
 const router = express.Router();
 
 router.get("/", authenticateToken, async (req, res) => {
@@ -63,7 +64,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
     }
 
     // Formatar a resposta
-    const formattedMenus = ({
+    const formattedMenus = {
       menu_id: menu.id,
       menu_name: menu.menu_name,
       items: menu.items.map((item) => ({
@@ -72,7 +73,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
         price: item.price,
         available: item.available,
       })),
-    });
+    };
 
     res.status(200).json(formattedMenus);
   } catch (error) {
@@ -82,7 +83,8 @@ router.get("/:id", authenticateToken, async (req, res) => {
 });
 
 router.post("/", authenticateToken, async (req, res) => {
-  const { menu_name } = req.body;
+  let { menu_name, image } = req.body;
+  menu_name = menu_name.toLowerCase();
 
   try {
     const { company_id } = req.user;
@@ -92,10 +94,28 @@ router.post("/", authenticateToken, async (req, res) => {
         .json({ error: "Usuário não está associado a uma empresa." });
     }
 
+    // Verifica se já existe um menu com o mesmo nome
+    const existingMenu = await Menus.findOne({
+      where: { menu_name, company_id },
+    });
+
+    if (existingMenu) {
+      return res
+        .status(400)
+        .json({ error: "Já existe um menu com esse nome." });
+    }
+
+    // Faz o upload da imagem para o Imgur
+    let imageUrl = "";
+    if (image) {
+      imageUrl = await uploadToImgur(image);
+    }
+
     // Cria o menu
     const newMenu = await Menus.create({
       menu_name,
       company_id,
+      image: imageUrl,
     });
 
     res.status(201).json({
@@ -110,7 +130,7 @@ router.post("/", authenticateToken, async (req, res) => {
 
 router.put("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
-  const { menu_name } = req.body;
+  const { menu_name, image } = req.body;
   const { company_id } = req.user;
 
   try {
@@ -125,8 +145,10 @@ router.put("/:id", authenticateToken, async (req, res) => {
       return res.status(403).json({ error: "Menu não encontrado." });
     }
 
-    menu.menu_name = menu_name;
-    await menu.save();
+    await menu.update({
+      menu_name,
+      image,
+    });
 
     res.status(200).json({
       message: "Menu atualizado com sucesso.",

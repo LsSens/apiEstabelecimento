@@ -1,6 +1,8 @@
 require("pg");
 
 const express = require("express");
+const cors = require("cors");
+
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocs = require("./swagger/swaggerConfig");
 
@@ -10,13 +12,15 @@ const itemRoutes = require("./routes/items");
 
 const app = express();
 
+// Permitindo origens
+app.use(cors());
 // Middleware básico
 app.use(express.json());
 
 // Configurar as rotas
-app.use("/auth", authRoutes);
-app.use("/menu", menusRoutes);
-app.use("/menu", itemRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/menu", menusRoutes);
+app.use("/api/menu", itemRoutes);
 
 // Configuração do Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));

@@ -29,11 +29,17 @@
  *                 token:
  *                   type: string
  *                   example: jwt_token_gerado
+ *                 expiresIn:
+ *                   type: number
+ *                   example: 36000
  *                 permissions:
  *                   type: array
  *                   items:
  *                     type: string
  *                     example: admin
+ *                 message:
+ *                   type: string
+ *                   example: Login realizado com sucesso.
  *       401:
  *         description: Credenciais inválidas.
  */
