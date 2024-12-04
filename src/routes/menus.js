@@ -23,6 +23,7 @@ router.get("/", authenticateToken, async (req, res) => {
     const formattedMenus = menus.map((menu) => ({
       menu_id: menu.id,
       menu_name: menu.menu_name,
+      menu_image: menu.image,
       items: menu.items.map((item) => ({
         item_id: item.id,
         name: item.name,
@@ -87,6 +88,10 @@ router.post("/", authenticateToken, async (req, res) => {
   menu_name = menu_name.toLowerCase();
 
   try {
+    if (!menu_name) {
+      return res.status(400).json({ error: "O nome do menu é obrigatório." });
+    }
+
     const { company_id } = req.user;
     if (!company_id) {
       return res
@@ -130,10 +135,15 @@ router.post("/", authenticateToken, async (req, res) => {
 
 router.put("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
-  const { menu_name, image } = req.body;
+  let { menu_name, image } = req.body;
   const { company_id } = req.user;
+  menu_name = menu_name.toLowerCase();
 
   try {
+    if (!menu_name) {
+      return res.status(400).json({ error: "O nome do menu é obrigatório." });
+    }
+
     const menu = await Menus.findOne({ where: { id } });
 
     if (!menu) {

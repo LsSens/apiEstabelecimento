@@ -4,9 +4,12 @@ const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID;
 
 const uploadToImgur = async (imageBase64) => {
   try {
+    // Remove o prefixo "data:image/png;base64," se existir
+    const cleanedBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+
     const response = await axios.post(
       "https://api.imgur.com/3/image",
-      { image: imageBase64 },
+      { image: cleanedBase64 },
       {
         headers: {
           Authorization: `Client-ID ${IMGUR_CLIENT_ID}`,

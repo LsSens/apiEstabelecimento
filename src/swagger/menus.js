@@ -108,6 +108,10 @@
  *               menu_name:
  *                 type: string
  *                 example: Bebidas
+ *               image:
+ *                 type: string
+ *                 nullable: true
+ *                 example: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
  *     responses:
  *       201:
  *         description: Menu adicionado com sucesso.
@@ -137,6 +141,10 @@
  *               menu_name:
  *                 type: string
  *                 example: Bebidas
+ *               image:
+ *                 type: string
+ *                 nullable: true
+ *                 example: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA
  *     responses:
  *       200:
  *         description: Menu atualizado com sucesso.
