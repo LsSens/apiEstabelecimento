@@ -19,14 +19,13 @@ module.exports = {
         allowNull: false,
         defaultValue: true,
       },
-      menu_id: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "menus",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "SET NULL",
+      description: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      image: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       createdAt: {
         type: Sequelize.DATE,

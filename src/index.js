@@ -25,8 +25,8 @@ app.use(express.json());
 
 // Configurar as rotas
 app.use("/api/auth", authRoutes);
-app.use("/api/menu", menusRoutes);
-app.use("/api/menu", itemRoutes);
+app.use("/api/menus", menusRoutes);
+app.use("/api/items", itemRoutes);
 
 // Configuração do Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));

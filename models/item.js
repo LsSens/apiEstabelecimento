@@ -4,15 +4,22 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Item extends Model {
     static associate(models) {
+
+      Item.belongsTo(models.Company, {
+        foreignKey: "company_id",
+        as: "company",
+      });
+
       // Relacionamento com Menu
-      Item.belongsTo(models.Menus, {
-        foreignKey: "menu_id",
+      Item.belongsToMany(models.Menus, {
+        through: models.MenuItems,
+        foreignKey: "item_id",
         as: "menus",
       });
 
       // Relacionamento com Orders (via tabela intermediária)
       Item.belongsToMany(models.Order, {
-        through: models.OrderItem, // Especificar a tabela intermediária
+        through: models.OrderItem,
         foreignKey: "item_id",
         as: "orders",
       });
@@ -23,8 +30,10 @@ module.exports = (sequelize, DataTypes) => {
     {
       name: DataTypes.STRING,
       price: DataTypes.DECIMAL,
+      description: DataTypes.STRING,
       available: DataTypes.BOOLEAN,
-      menu_id: DataTypes.INTEGER,
+      image: DataTypes.STRING,
+      company_id: DataTypes.INTEGER,
     },
     {
       sequelize,

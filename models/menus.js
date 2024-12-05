@@ -9,7 +9,8 @@ module.exports = (sequelize, DataTypes) => {
         as: "company",
       });
 
-      Menus.hasMany(models.Item, {
+      Menus.belongsToMany(models.Item, {
+        through: models.MenuItems,
         foreignKey: "menu_id",
         as: "items",
       });
@@ -18,14 +19,28 @@ module.exports = (sequelize, DataTypes) => {
 
   Menus.init(
     {
-      menu_name: DataTypes.STRING,
-      company_id: DataTypes.INTEGER,
-      image: DataTypes.STRING,
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      menu_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      image: {
+        type: DataTypes.STRING,
+      },
+      company_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
     {
       sequelize,
       modelName: "Menus",
       tableName: "menus",
+      timestamps: true,
     }
   );
 

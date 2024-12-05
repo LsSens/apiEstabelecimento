@@ -1,116 +1,52 @@
 /**
  * @swagger
- * /menu/{menu_id}/item/{item_id}:
+ * /items:
  *   get:
- *     summary: Item do menu.
+ *     summary: Retorna todos os itens associados ao company_id do usuário autenticado.
  *     tags:
  *       - Cardápio - Items
- *     parameters:
- *       - name: menu_id
- *         in: path
- *         required: true
- *         description: ID do menu.
- *         schema:
- *           type: integer
- *       - name: item_id
- *         in: path
- *         required: true
- *         description: ID do item no menu.
- *         schema:
- *           type: integer
  *     responses:
  *       200:
- *         description: Dados do item.
+ *         description: Lista de itens associados ao company_id.
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 7
- *                 name:
- *                   type: string
- *                   example: Coca-Cola
- *                 price:
- *                   type: string
- *                   example: "5.99"
- *                 available:
- *                   type: boolean
- *                   example: true
- *                 menu_id:
- *                   type: integer
- *                   example: 2
- *                 createdAt:
- *                   type: string
- *                   format: date-time
- *                   example: "2024-12-02T17:46:12.296Z"
- *                 updatedAt:
- *                   type: string
- *                   format: date-time
- *                   example: "2024-12-02T17:46:12.296Z"
- *       403:
- *         description: Permissão negada.
- *       404:
- *         description: Menu ou item não encontrado.
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   name:
+ *                     type: string
+ *                     example: Coca-Cola
+ *                   price:
+ *                     type: number
+ *                     format: float
+ *                     example: 5.99
+ *                   available:
+ *                     type: boolean
+ *                     example: true
+ *                   image:
+ *                     type: string
+ *                     example: https://example.com/image.png
  *       500:
- *         description: Erro interno do servidor.
+ *         description: Erro ao buscar itens.
  */
+
 /**
  * @swagger
- * /menu/{menu_id}/items:
- *   post:
- *     summary: Adiciona um novo item ao menu.
- *     tags:
- *       - Cardápio - Items
- *     parameters:
- *       - name: menu_id
- *         in: path
- *         required: true
- *         description: ID do menu a ser atualizado.
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: array
- *             items:
- *               type: object
- *               properties:
- *                 name:
- *                   type: string
- *                   example: Coca-Cola
- *                 price:
- *                   type: number
- *                   format: float
- *                   example: 5.99
- *                 available:
- *                   type: boolean
- *                   example: true
- *     responses:
- *       201:
- *         description: Item adicionado com sucesso.
- */
-/**
- * @swagger
- * /menu/{menu_id}/item/{item_id}:
+ * /items/{id}:
  *   put:
- *     summary: Atualiza os dados de um item no menu.
+ *     summary: Atualiza um item específico pelo ID.
  *     tags:
  *       - Cardápio - Items
  *     parameters:
- *       - name: menu_id
+ *       - name: id
  *         in: path
  *         required: true
- *         description: ID do menu.
- *         schema:
- *           type: integer
- *       - name: item_id
- *         in: path
- *         required: true
- *         description: ID do item no menu.
+ *         description: ID do item a ser atualizado.
  *         schema:
  *           type: integer
  *     requestBody:
@@ -130,43 +66,72 @@
  *               available:
  *                 type: boolean
  *                 example: false
+ *               image:
+ *                 type: string
+ *                 example: https://example.com/new-image.png
  *     responses:
  *       200:
  *         description: Item atualizado com sucesso.
- *       403:
- *         description: Permissão negada.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Item atualizado com sucesso.
+ *                 item:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: Coca-Cola Zero
+ *                     price:
+ *                       type: number
+ *                       format: float
+ *                       example: 6.99
+ *                     available:
+ *                       type: boolean
+ *                       example: false
+ *                     image:
+ *                       type: string
+ *                       example: https://example.com/new-image.png
  *       404:
- *         description: Menu ou item não encontrado.
+ *         description: Item não encontrado.
  *       500:
- *         description: Erro interno do servidor.
+ *         description: Erro ao atualizar o item.
  */
+
 /**
  * @swagger
- * /menu/{menu_id}/item/{item_id}:
+ * /items/{id}:
  *   delete:
- *     summary: Remove um item do menu.
+ *     summary: Exclui um item específico pelo ID.
  *     tags:
  *       - Cardápio - Items
  *     parameters:
- *       - name: menu_id
+ *       - name: id
  *         in: path
  *         required: true
- *         description: ID do menu.
- *         schema:
- *           type: integer
- *       - name: item_id
- *         in: path
- *         required: true
- *         description: ID do item no menu.
+ *         description: ID do item a ser excluído.
  *         schema:
  *           type: integer
  *     responses:
  *       200:
- *         description: Item deletado com sucesso.
- *       403:
- *         description: Permissão negada.
+ *         description: Item excluído com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Item excluído com sucesso.
  *       404:
- *         description: Menu ou item não encontrado.
+ *         description: Item não encontrado.
  *       500:
- *         description: Erro interno do servidor.
+ *         description: Erro ao excluir o item.
  */

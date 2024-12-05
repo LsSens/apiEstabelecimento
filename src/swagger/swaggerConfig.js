@@ -11,7 +11,11 @@ const swaggerOptions = {
     servers: [
       {
         url: "https://apiestabelecimento-production.up.railway.app/api",
-        description: "Servidor Local",
+        description: "API Railway",
+      },
+      {
+        url: "http://localhost:3000/api",
+        description: "API Local",
       },
     ],
     components: {

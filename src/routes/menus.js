@@ -15,6 +15,7 @@ router.get("/", authenticateToken, async (req, res) => {
           model: Item,
           as: "items",
           attributes: ["id", "name", "price", "available"],
+          through: { attributes: [] },
         },
       ],
     });
@@ -80,6 +81,78 @@ router.get("/:id", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erro ao atualizar o menu." });
+  }
+});
+
+// Associar itens a um menu
+router.post("/:menu_id/items", authenticateToken, async (req, res) => {
+  const { menu_id } = req.params;
+  const { items } = req.body;
+  const { company_id } = req.user;
+
+  try {
+    const menu = await Menus.findOne({ where: { id: menu_id, company_id } });
+
+    if (!menu) {
+      return res.status(404).json({ error: "Menu não encontrado." });
+    }
+
+    // Validar se "items" é um array válido
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: "Os itens devem ser válidos." });
+    }
+
+    const associatedItems = [];
+
+    for (const item of items) {
+      const { name, price, available, image } = item;
+
+      // Validar os campos do item
+      if (
+        !name ||
+        typeof price !== "number" ||
+        typeof available !== "boolean"
+      ) {
+        return res.status(400).json({
+          error: "Item inválido. Campos obrigatórios: name, price, available.",
+        });
+      }
+
+      // Verificar se o item já existe com base no nome
+      let existingItem = await Item.findOne({
+        where: { name, company_id },
+      });
+
+      // Criar o item se ele não existir
+      if (!existingItem) {
+        existingItem = await Item.create({
+          name,
+          price,
+          available,
+          image: image || null,
+          company_id,
+        });
+      }
+
+      // Associar o item ao menu na tabela intermediária
+      await MenuItems.findOrCreate({
+        where: { menu_id, item_id: existingItem.id, company_id },
+      });
+
+      // Remover o `company_id` do item antes de retornar
+      const itemToReturn = existingItem.toJSON();
+      delete itemToReturn.company_id;
+
+      associatedItems.push(itemToReturn);
+    }
+
+    res.status(201).json({
+      message: "Itens adicionados ao menu com sucesso.",
+      items: associatedItems,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao adicionar itens ao menu." });
   }
 });
 

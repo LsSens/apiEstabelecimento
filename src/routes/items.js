@@ -1,142 +1,54 @@
 const express = require("express");
-const { Menus, Item } = require("../../models");
+const { Item } = require("../../models");
 const authenticateToken = require("../middlewares/authenticateToken");
 const router = express.Router();
 
-router.get("/:menu_id/item/:item_id", authenticateToken, async (req, res) => {
-  const { menu_id, item_id } = req.params; // menu_id e item_id
-  const { company_id } = req.user; // company_id do usuário autenticado
-
-  try {
-    // Verificar se o menu existe
-    const menu = await Menus.findOne({ where: { id: menu_id } });
-
-    if (!menu) {
-      return res.status(404).json({ error: "Menu não encontrado." });
-    }
-
-    // Verificar se o menu pertence à empresa do usuário autenticado
-    if (menu.company_id !== company_id) {
-      return res.status(403).json({
-        error: "Item não encontrado neste menu.",
-      });
-    }
-
-    // Verificar se o item existe e está associado ao menu
-    const item = await Item.findOne({
-      where: { id: item_id, menu_id },
-    });
-
-    if (!item) {
-      return res.status(404).json({ error: "Item não encontrado neste menu." });
-    }
-
-    res.status(200).json(item);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erro ao deletar o item." });
-  }
-});
-
-router.post("/:menu_id/items", authenticateToken, async (req, res) => {
-  const { menu_id } = req.params;
-  const items = req.body;
+// Ver itens
+router.get("/", authenticateToken, async (req, res) => {
   const { company_id } = req.user;
 
   try {
-    const menu = await Menus.findOne({ where: { id: menu_id } });
-
-    if (!menu) {
-      return res.status(404).json({ error: "Menu não encontrado." });
-    }
-
-    if (menu.company_id !== company_id) {
-      return res.status(403).json({
-        error: "Menu não encontrado.",
-      });
-    }
-
-    // Validar itens recebidos
-    if (!Array.isArray(items) || items.length === 0) {
-      return res
-        .status(400)
-        .json({ error: "O corpo da requisição deve ser um array de itens." });
-    }
-
-    const invalidItems = items.filter(
-      (item) =>
-        !item.name ||
-        typeof item.price !== "number" ||
-        typeof item.available !== "boolean"
-    );
-    if (invalidItems.length > 0) {
-      return res.status(400).json({
-        error: "Alguns itens possuem dados inválidos.",
-        details: invalidItems,
-      });
-    }
-
-    // Criar itens no menu
-    const createdItems = await Promise.all(
-      items.map(async (item) =>
-        Item.create({
-          name: item.name,
-          price: item.price,
-          available: item.available,
-          menu_id,
-        })
-      )
-    );
-
-    res.status(201).json({
-      message: "Item(ns) criado(s) com sucesso.",
-      items: createdItems,
+    const items = await Item.findAll({
+      where: { company_id },
+      attributes: ["id", "name", "price", "available", "image"],
     });
+
+    res.status(200).json(items);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Erro ao criar o(s) item(ns)." });
+    res.status(500).json({ error: "Erro ao buscar itens." });
   }
 });
 
-router.put("/:menu_id/item/:item_id", authenticateToken, async (req, res) => {
-  const { menu_id, item_id } = req.params; // menu_id e item_id
-  const { name, price, available } = req.body; // Dados para atualização
-  const { company_id } = req.user; // company_id do usuário autenticado
+//Atualizar itens
+router.put("/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { name, price, available, image } = req.body;
+  const { company_id } = req.user;
 
   try {
-    // Verificar se o menu existe
-    const menu = await Menus.findOne({ where: { id: menu_id } });
-
-    if (!menu) {
-      return res.status(404).json({ error: "Menu não encontrado." });
-    }
-
-    // Verificar se o menu pertence à empresa do usuário autenticado
-    if (menu.company_id !== company_id) {
-      return res.status(403).json({
-        error: "Item não encontrado neste menu.",
-      });
-    }
-
-    // Verificar se o item existe e está associado ao menu
-    const item = await Item.findOne({
-      where: { id: item_id, menu_id },
-    });
+    const item = await Item.findOne({ where: { id, company_id } });
 
     if (!item) {
-      return res.status(404).json({ error: "Item não encontrado neste menu." });
+      return res.status(404).json({ error: "Item não encontrado." });
     }
 
-    // Atualizar o item
     item.name = name || item.name;
     item.price = price !== undefined ? price : item.price;
     item.available = available !== undefined ? available : item.available;
+    item.image = image || item.image;
 
     await item.save();
 
     res.status(200).json({
       message: "Item atualizado com sucesso.",
-      item,
+      item: {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        available: item.available,
+        image: item.image,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -144,50 +56,27 @@ router.put("/:menu_id/item/:item_id", authenticateToken, async (req, res) => {
   }
 });
 
-router.delete(
-  "/:menu_id/item/:item_id",
-  authenticateToken,
-  async (req, res) => {
-    const { menu_id, item_id } = req.params; // menu_id e item_id
-    const { company_id } = req.user; // company_id do usuário autenticado
+//Deletar item
+router.delete("/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { company_id } = req.user;
 
-    try {
-      // Verificar se o menu existe
-      const menu = await Menus.findOne({ where: { id: menu_id } });
+  try {
+    const item = await Item.findOne({ where: { id, company_id } });
 
-      if (!menu) {
-        return res.status(404).json({ error: "Menu não encontrado." });
-      }
-
-      // Verificar se o menu pertence à empresa do usuário autenticado
-      if (menu.company_id !== company_id) {
-        return res.status(403).json({
-          error: "Item não encontrado neste menu.",
-        });
-      }
-
-      // Verificar se o item existe e está associado ao menu
-      const item = await Item.findOne({
-        where: { id: item_id, menu_id },
-      });
-
-      if (!item) {
-        return res
-          .status(404)
-          .json({ error: "Item não encontrado neste menu." });
-      }
-
-      // Deletar o item
-      await item.destroy();
-
-      res.status(200).json({
-        message: "Item deletado com sucesso.",
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Erro ao deletar o item." });
+    if (!item) {
+      return res.status(404).json({ error: "Item não encontrado." });
     }
+
+    await item.destroy();
+
+    res.status(200).json({
+      message: "Item excluído com sucesso.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao excluir o item." });
   }
-);
+});
 
 module.exports = router;

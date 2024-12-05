@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /menu:
+ * /menus:
  *   get:
  *     summary: Retorna o cardápio completo do estabelecimento.
  *     tags:
@@ -41,7 +41,7 @@
  */
 /**
  * @swagger
- * /menu/{menu_id}:
+ * /menus/{menu_id}:
  *   get:
  *     summary: Menu detalhado.
  *     tags:
@@ -93,7 +93,7 @@
  */
 /**
  * @swagger
- * /menu:
+ * /menus:
  *   post:
  *     summary: Adiciona um novo menu ao cardápio.
  *     tags:
@@ -119,7 +119,123 @@
 
 /**
  * @swagger
- * /menu/{menu_id}:
+ * /menus/{menu_id}/items:
+ *   post:
+ *     summary: Adiciona itens ao menu.
+ *     tags:
+ *       - Cardápio - Menus
+ *     parameters:
+ *       - name: menu_id
+ *         in: path
+ *         required: true
+ *         description: ID do menu onde os itens serão adicionados.
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               items:
+ *                 type: array
+ *                 description: Lista de itens a serem adicionados ao menu.
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       description: Nome do item.
+ *                       example: Coca-Cola
+ *                     price:
+ *                       type: number
+ *                       format: float
+ *                       description: Preço do item.
+ *                       example: 5.99
+ *                     available:
+ *                       type: boolean
+ *                       description: Indica se o item está disponível.
+ *                       example: true
+ *                     image:
+ *                       type: string
+ *                       format: uri
+ *                       description: URL da imagem do item (opcional).
+ *                       example: https://example.com/image.png
+ *     responses:
+ *       201:
+ *         description: Itens adicionados ao menu com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Itens adicionados ao menu com sucesso.
+ *                 items:
+ *                   type: array
+ *                   description: Lista de itens adicionados.
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         description: ID do item.
+ *                         example: 1
+ *                       name:
+ *                         type: string
+ *                         description: Nome do item.
+ *                         example: Coca-Cola
+ *                       price:
+ *                         type: number
+ *                         format: float
+ *                         description: Preço do item.
+ *                         example: 5.99
+ *                       available:
+ *                         type: boolean
+ *                         description: Indica se o item está disponível.
+ *                         example: true
+ *                       image:
+ *                         type: string
+ *                         format: uri
+ *                         description: URL da imagem do item.
+ *                         example: https://example.com/image.png
+ *       400:
+ *         description: Requisição inválida. O payload pode estar incorreto.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Os itens devem ser válidos."
+ *       404:
+ *         description: Menu não encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Menu não encontrado."
+ *       500:
+ *         description: Erro interno do servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erro ao adicionar itens ao menu."
+ */
+
+/**
+ * @swagger
+ * /menus/{menu_id}:
  *   put:
  *     summary: Atualiza informações de um menu do cardápio.
  *     tags:
@@ -151,7 +267,7 @@
  */
 /**
  * @swagger
- * /menu/{menu_id}:
+ * /menus/{menu_id}:
  *   delete:
  *     summary: Remove um menu do cardápio.
  *     tags:
