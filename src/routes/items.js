@@ -10,7 +10,7 @@ router.get("/", authenticateToken, async (req, res) => {
   try {
     const items = await Item.findAll({
       where: { company_id },
-      attributes: ["id", "name", "price", "available", "image"],
+      attributes: ["id", "name", "description", "price", "available", "image"],
     });
 
     res.status(200).json(items);
@@ -20,10 +20,49 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
+// Criar item
+router.post("/", authenticateToken, async (req, res) => {
+  const { name, price, available, image, description } = req.body;
+  const { company_id } = req.user;
+
+  try {
+    if (!name || typeof price !== "number" || typeof available !== "boolean") {
+      return res.status(400).json({
+        error:
+          "Os campos 'name', 'price' e 'available' são obrigatórios e devem ser válidos.",
+      });
+    }
+
+    const newItem = await Item.create({
+      name,
+      price,
+      available,
+      image: image || null,
+      description: description || null,
+      company_id,
+    });
+
+    res.status(201).json({
+      message: "Item criado com sucesso.",
+      item: {
+        id: newItem.id,
+        name: newItem.name,
+        description: newItem.description,
+        price: newItem.price,
+        available: newItem.available,
+        image: newItem.image,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao criar o item." });
+  }
+});
+
 //Atualizar itens
 router.put("/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
-  const { name, price, available, image } = req.body;
+  const { name, price, available, image, description } = req.body;
   const { company_id } = req.user;
 
   try {
@@ -37,6 +76,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
     item.price = price !== undefined ? price : item.price;
     item.available = available !== undefined ? available : item.available;
     item.image = image || item.image;
+    item.description = description || item.description;
 
     await item.save();
 
@@ -45,6 +85,7 @@ router.put("/:id", authenticateToken, async (req, res) => {
       item: {
         id: item.id,
         name: item.name,
+        description: item.description,
         price: item.price,
         available: item.available,
         image: item.image,

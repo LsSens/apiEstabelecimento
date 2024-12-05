@@ -21,6 +21,9 @@
  *                   name:
  *                     type: string
  *                     example: Coca-Cola
+ *                   description:
+ *                     type: string
+ *                     example: Very good
  *                   price:
  *                     type: number
  *                     format: float
@@ -33,6 +36,102 @@
  *                     example: https://example.com/image.png
  *       500:
  *         description: Erro ao buscar itens.
+ */
+
+/**
+ * @swagger
+ * /items:
+ *   post:
+ *     summary: Criar um novo item
+ *     tags:
+ *       - Cardápio - Items
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nome do item (obrigatório).
+ *                 example: Coca-Cola
+ *               price:
+ *                 type: number
+ *                 format: float
+ *                 description: Preço do item (obrigatório).
+ *                 example: 5.99
+ *               available:
+ *                 type: boolean
+ *                 description: Disponibilidade do item (obrigatório).
+ *                 example: true
+ *               description:
+ *                 type: string
+ *                 description: Descrição opcional do item.
+ *                 example: Bebida gelada
+ *               image:
+ *                 type: string
+ *                 description: URL ou base64 da imagem opcional do item.
+ *                 example: https://example.com/image.jpg
+ *     responses:
+ *       201:
+ *         description: Item criado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Item criado com sucesso.
+ *                 item:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       description: ID do item criado.
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       description: Nome do item.
+ *                       example: Coca-Cola
+ *                     description:
+ *                       type: string
+ *                       description: Descrição do item.
+ *                       example: Bebida gelada
+ *                     price:
+ *                       type: number
+ *                       format: float
+ *                       description: Preço do item.
+ *                       example: 5.99
+ *                     available:
+ *                       type: boolean
+ *                       description: Disponibilidade do item.
+ *                       example: true
+ *                     image:
+ *                       type: string
+ *                       description: Imagem associada ao item.
+ *                       example: https://example.com/image.jpg
+ *       400:
+ *         description: Erro de validação nos dados enviados.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Os campos 'name', 'price' e 'available' são obrigatórios e devem ser válidos.
+ *       500:
+ *         description: Erro interno do servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Erro ao criar o item.
  */
 
 /**
@@ -59,6 +158,9 @@
  *               name:
  *                 type: string
  *                 example: Coca-Cola Zero
+ *               description:
+ *                 type: string
+ *                 example: Very good
  *               price:
  *                 type: number
  *                 format: float
@@ -89,6 +191,9 @@
  *                     name:
  *                       type: string
  *                       example: Coca-Cola Zero
+ *                     description:
+ *                       type: string
+ *                       example: Very good
  *                     price:
  *                       type: number
  *                       format: float
