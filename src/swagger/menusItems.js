@@ -40,6 +40,69 @@
 
 /**
  * @swagger
+ * /items/{id}:
+ *   get:
+ *     summary: Retorna um item específico pelo ID.
+ *     tags:
+ *       - Cardápio - Items
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID do item a ser buscado.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Detalhes do item solicitado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 name:
+ *                   type: string
+ *                   example: Coca-Cola
+ *                 description:
+ *                   type: string
+ *                   example: Very good
+ *                 price:
+ *                   type: number
+ *                   format: float
+ *                   example: 5.99
+ *                 available:
+ *                   type: boolean
+ *                   example: true
+ *                 image:
+ *                   type: string
+ *                   example: https://example.com/image.png
+ *       404:
+ *         description: Item não encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Item não encontrado.
+ *       500:
+ *         description: Erro ao buscar o item.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Erro ao buscar o item.
+ */
+
+/**
+ * @swagger
  * /items:
  *   post:
  *     summary: Criar um novo item

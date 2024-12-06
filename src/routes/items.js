@@ -20,6 +20,28 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
+// Ver item por id
+router.get("/:id", authenticateToken, async (req, res) => {
+  const { company_id } = req.user;
+  const { id } = req.params;
+
+  try {
+    const item = await Item.findOne({
+      where: { id, company_id },
+      attributes: ["id", "name", "description", "price", "available", "image"],
+    });
+
+    if (!item) {
+      return res.status(404).json({ error: "Item não encontrado." });
+    }
+
+    res.status(200).json(item);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao buscar o item." });
+  }
+});
+
 // Criar item
 router.post("/", authenticateToken, async (req, res) => {
   const { name, price, available, image, description } = req.body;
