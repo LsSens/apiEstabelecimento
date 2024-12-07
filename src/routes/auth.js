@@ -33,8 +33,25 @@ router.post("/register", async (req, res) => {
       company_id: newCompany.id,
     });
 
+    // Tempo de expiração do token
+    const expiresIn = 60 * 60 * 1;
+
+    // Gerar o token JWT
+    const token = jwt.sign(
+      {
+        user_id: newUser.id,
+        company_id: newUser.company_id,
+        permissions: newUser.permissions,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn }
+    );
+
     res.status(201).json({
       message: "Usuário e empresa criados com sucesso.",
+      token,
+      expiresIn,
+      permissions: newUser.permissions,
       user: {
         id: newUser.id,
         email: newUser.email,
