@@ -80,7 +80,7 @@
  *                     example: 12345678000195
  *                   address:
  *                     type: object
- *                     example: { "street": "Rua Exemplo", "number": "123", "city": "São Paulo", "state": "SP" }
+ *                     example: { "street": "Rua Exemplo", "number": "123", "city": "São Paulo", "state": "SP", "cep": "11111-111", "lat": "-41.12313131", "lng": "-41.12313131", "neighborhood": "Morumbi", "complement": "apto 22" }
  *     responses:
  *       201:
  *         description: Usuário e empresa registrados com sucesso.

@@ -14,6 +14,14 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "E-mail já está em uso." });
     }
 
+    // Verificar se o CNPJ já está em uso
+    const existingCompany = await Company.findOne({
+      where: { cnpj: company.cnpj },
+    });
+    if (existingCompany) {
+      return res.status(400).json({ error: "CNPJ já está registrado." });
+    }
+
     // Criar a empresa
     const newCompany = await Company.create({
       name: company.name,
