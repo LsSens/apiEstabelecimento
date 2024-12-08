@@ -25,7 +25,7 @@ router.get("/", authenticateToken, async (req, res) => {
       menu_id: menu.id,
       menu_name: menu.menu_name,
       menu_image: menu.image,
-      items: menu.items.map((item) => ({
+      items: menu.items.slice(0, 3).map((item) => ({
         item_id: item.id,
         name: item.name,
         price: item.price,
