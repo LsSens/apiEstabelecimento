@@ -198,18 +198,9 @@ router.post("/reset-password", async (req, res) => {
       return res.status(404).json({ error: "Usuário não encontrado." });
     }
 
-    // Verificar se o token corresponde ao do banco
-    if (user.reset_token !== token) {
-      return res.status(400).json({ error: "Token inválido." });
-    }
-
     // Redefinir a senha
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
-
-    // Limpar o token e a expiração
-    user.reset_token = null;
-    user.reset_token_expires = null;
 
     // Salvar as alterações no banco de dados
     await user.save();
