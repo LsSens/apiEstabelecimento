@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { User, Company } = require("../../models");
+const transporter = require("../services/emailService");
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
@@ -114,6 +115,113 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erro ao fazer login." });
+  }
+});
+
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Verificar se o e-mail existe no banco de dados
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ error: "Usuário não encontrado." });
+    }
+
+    // Gerar o token de redefinição de senha com e-mail e expiração
+    const resetTokenExpires = new Date(Date.now() + 2 * 60 * 60 * 1000);
+    const resetTokenPayload = {
+      email: user.email,
+      expires: resetTokenExpires,
+    };
+
+    // Converte o payload em base64 para criar o token
+    const resetToken = Buffer.from(JSON.stringify(resetTokenPayload)).toString(
+      "base64"
+    );
+
+    // Salvar o token e a expiração no banco de dados
+    user.reset_token = resetToken;
+    user.reset_token_expires = resetTokenExpires;
+    await user.save();
+
+    // Gerar a URL para redefinição
+    const resetUrl = `https://nossaurl.com.br/forgot-password?token=${resetToken}&email=${encodeURIComponent(
+      user.email
+    )}`;
+
+    // Enviar o e-mail com o link de redefinição
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Redefinição de senha",
+      text: `Você solicitou a redefinição de sua senha. Clique no link abaixo para redefinir sua senha:\n\n${resetUrl}\n\nEste link expira em 2 horas.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({
+      message: "E-mail de redefinição enviado com sucesso.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Erro ao enviar e-mail de redefinição de senha.",
+    });
+  }
+});
+
+router.post("/reset-password", async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    // Decodificar o token
+    const decodedToken = JSON.parse(
+      Buffer.from(token, "base64").toString("utf8")
+    );
+
+    // Verificar se o token contém o e-mail e a expiração
+    if (!decodedToken.email || !decodedToken.expires) {
+      return res.status(400).json({ error: "Token inválido." });
+    }
+
+    const tokenExpiration = new Date(decodedToken.expires);
+    if (Date.now() > tokenExpiration) {
+      return res.status(400).json({ error: "O token expirou." });
+    }
+
+    const email = decodedToken.email;
+
+    // Verificar se o e-mail existe no banco de dados
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ error: "Usuário não encontrado." });
+    }
+
+    // Verificar se o token corresponde ao do banco
+    if (user.reset_token !== token) {
+      return res.status(400).json({ error: "Token inválido." });
+    }
+
+    // Redefinir a senha
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    // Limpar o token e a expiração
+    user.reset_token = null;
+    user.reset_token_expires = null;
+
+    // Salvar as alterações no banco de dados
+    await user.save();
+
+    res.status(200).json({
+      message: "Senha redefinida com sucesso.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Erro ao redefinir a senha.",
+    });
   }
 });
 
