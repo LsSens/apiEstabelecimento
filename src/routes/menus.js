@@ -1,5 +1,5 @@
 const express = require("express");
-const { Menus, Item } = require("../../models");
+const { Menus, Item } = require("../models");
 const authenticateToken = require("../middlewares/authenticateToken");
 const uploadToImgur = require("../images/imgur");
 const router = express.Router();

@@ -7,6 +7,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "company_id",
         as: "users",
       });
+      // Relacionamento com Customers
+      Company.belongsToMany(models.Customer, {
+        through: "customer_company",
+        foreignKey: "company_id",
+        as: "customers",
+      });
     }
   }
   Company.init(

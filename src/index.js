@@ -10,6 +10,7 @@ const swaggerDocs = require("./swagger/swaggerConfig");
 const authRoutes = require("./routes/auth");
 const menusRoutes = require("./routes/menus");
 const itemRoutes = require("./routes/items");
+const customersRoutes = require("./routes/customers");
 
 const app = express();
 
@@ -24,15 +25,20 @@ app.use(cors());
 app.use(express.json());
 
 // Configurar as rotas
+app.use("/api/customers", customersRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/menus", menusRoutes);
 app.use("/api/items", itemRoutes);
 
 // Configuração do Swagger
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Inicialização do servidor
 app.listen(3000, () => {
-  console.log("Servidor rodando em https://apiestabelecimento-production.up.railway.app");
-  console.log("Documentação disponível em https://apiestabelecimento-production.up.railway.app/api-docs");
+  console.log(
+    "Servidor rodando em https://apiestabelecimento-production.up.railway.app"
+  );
+  console.log(
+    "Documentação disponível em https://apiestabelecimento-production.up.railway.app/"
+  );
 });
