@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
 
       // Relacionamento com Orders (via tabela intermediária)
       Item.belongsToMany(models.Order, {
-        through: models.OrderItem,
+        through: models.OrderItems,
         foreignKey: "item_id",
         as: "orders",
       });

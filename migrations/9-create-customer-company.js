@@ -39,11 +39,22 @@ module.exports = {
       },
     });
 
-    // Adicionando a restrição de unicidade
-    await queryInterface.addConstraint("customer_company", {
-      fields: ["customer_id", "company_id"],
-      type: "unique",
-      name: "unique_customer_company",
-    });
+    // Verificando se a restrição já existe
+    const [results] = await queryInterface.sequelize.query(`
+          SELECT CONSTRAINT_NAME
+          FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+          WHERE TABLE_NAME = 'customer_company' 
+            AND CONSTRAINT_TYPE = 'UNIQUE'
+            AND CONSTRAINT_NAME = 'unique_customer_company'
+        `);
+
+    if (results.length === 0) {
+      // Adicionando a restrição de unicidade
+      await queryInterface.addConstraint("customer_company", {
+        fields: ["customer_id", "company_id"],
+        type: "unique",
+        name: "unique_customer_company",
+      });
+    }
   },
 };

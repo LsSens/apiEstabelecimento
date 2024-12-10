@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // Relacionamento com Items (via tabela intermediária)
       Order.belongsToMany(models.Item, {
-        through: models.OrderItem,
+        through: models.OrderItems,
         foreignKey: "order_id",
         as: "items",
       });
@@ -29,8 +29,14 @@ module.exports = (sequelize, DataTypes) => {
     {
       customer_id: DataTypes.INTEGER,
       total: DataTypes.DECIMAL,
-      status: DataTypes.STRING,
+      status: {
+        type: DataTypes.STRING,
+        defaultValue: "PENDING",
+      },
       company_id: DataTypes.INTEGER,
+      payment_method: DataTypes.STRING,
+      delivery_fee: DataTypes.DECIMAL,
+      notes: DataTypes.STRING,
     },
     {
       sequelize,

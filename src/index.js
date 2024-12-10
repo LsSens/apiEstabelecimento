@@ -11,6 +11,7 @@ const authRoutes = require("./routes/auth");
 const menusRoutes = require("./routes/menus");
 const itemRoutes = require("./routes/items");
 const customersRoutes = require("./routes/customers");
+const ordersRoutes = require("./routes/orders");
 
 const app = express();
 
@@ -26,9 +27,10 @@ app.use(express.json());
 
 // Configurar as rotas
 app.use("/api/customers", customersRoutes);
-app.use("/api/auth", authRoutes);
+app.use("/api/orders", ordersRoutes);
 app.use("/api/menus", menusRoutes);
 app.use("/api/items", itemRoutes);
+app.use("/api/auth", authRoutes);
 
 // Configuração do Swagger
 app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocs));

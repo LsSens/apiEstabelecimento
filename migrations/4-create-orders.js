@@ -33,6 +33,18 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
+      payment_method: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      delivery_fee: {
+        type: Sequelize.DECIMAL,
+        allowNull: true,
+      },
+      notes: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
