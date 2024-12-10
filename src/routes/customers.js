@@ -27,7 +27,7 @@ router.get("/", authenticateToken, async (req, res) => {
             "phone",
             "address",
             "createdAt",
-            "updateAt",
+            "updatedAt",
           ],
         },
       ],
