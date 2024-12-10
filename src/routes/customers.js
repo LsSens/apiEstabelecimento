@@ -20,7 +20,15 @@ router.get("/", authenticateToken, async (req, res) => {
         {
           model: Customer,
           as: "customer",
-          attributes: ["id", "name", "email", "phone", "address", "createdAt"],
+          attributes: [
+            "id",
+            "name",
+            "email",
+            "phone",
+            "address",
+            "createdAt",
+            "updateAt",
+          ],
         },
       ],
     });
