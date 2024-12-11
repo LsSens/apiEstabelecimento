@@ -5,98 +5,148 @@
  *     summary: Retorna todos os deliveries associados a uma empresa.
  *     tags:
  *       - Deliveries
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         description: Número da página para paginação.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - name: limit
+ *         in: query
+ *         description: Quantidade de deliveries por página.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 10
  *     responses:
  *       200:
  *         description: Lista de deliveries associados à empresa.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 8
- *                   company_id:
- *                     type: integer
- *                     example: 1
- *                   delivery_status:
- *                     type: string
- *                     example: "PENDING"
- *                   total_cost:
- *                     type: number
- *                     example: 200.50
- *                   total_fee:
- *                     type: number
- *                     example: 15.00
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                     example: "2024-12-11T05:26:46.605Z"
- *                   updatedAt:
- *                     type: string
- *                     format: date-time
- *                     example: "2024-12-11T05:26:46.605Z"
- *                   deletedAt:
- *                     type: string
- *                     format: date-time
- *                     nullable: true
- *                     example: null
- *                   orders:
- *                     type: array
- *                     items:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: integer
- *                           example: 9
- *                         customer_id:
- *                           type: integer
- *                           example: 1
- *                         total:
- *                           type: number
- *                           example: 25.97
- *                         status:
- *                           type: string
- *                           example: "PENDING"
- *                         company_id:
- *                           type: integer
- *                           example: 1
- *                         payment_method:
- *                           type: string
- *                           example: "credit_card"
- *                         delivery_fee:
- *                           type: number
- *                           example: 5.00
- *                         notes:
- *                           type: string
- *                           example: "Sem cebola"
- *                         createdAt:
- *                           type: string
- *                           format: date-time
- *                           example: "2024-12-10T16:34:59.818Z"
- *                         updatedAt:
- *                           type: string
- *                           format: date-time
- *                           example: "2024-12-10T16:34:59.818Z"
+ *               type: object
+ *               properties:
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalItems:
+ *                   type: integer
+ *                   example: 50
+ *                 itemsPerPage:
+ *                   type: integer
+ *                   example: 10
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 8
+ *                       company_id:
+ *                         type: integer
+ *                         example: 1
+ *                       delivery_status:
+ *                         type: string
+ *                         example: "PENDING"
+ *                       total_cost:
+ *                         type: number
+ *                         example: 200.50
+ *                       total_fee:
+ *                         type: number
+ *                         example: 15.00
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-12-11T05:26:46.605Z"
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-12-11T05:26:46.605Z"
+ *                       deletedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         nullable: true
+ *                         example: null
+ *                       orders:
+ *                         type: array
  *                         items:
- *                           type: array
- *                           items:
- *                             type: object
- *                             properties:
- *                               id:
- *                                 type: integer
- *                                 example: 1
- *                               name:
- *                                 type: string
- *                                 example: "Coca-Cola Zero"
- *                               price:
- *                                 type: number
- *                                 example: 6.99
- *                               quantity:
- *                                 type: integer
- *                                 example: 2
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: integer
+ *                               example: 9
+ *                             customer_id:
+ *                               type: integer
+ *                               example: 1
+ *                             total:
+ *                               type: number
+ *                               example: 25.97
+ *                             status:
+ *                               type: string
+ *                               example: "PENDING"
+ *                             company_id:
+ *                               type: integer
+ *                               example: 1
+ *                             payment_method:
+ *                               type: string
+ *                               example: "credit_card"
+ *                             delivery_fee:
+ *                               type: number
+ *                               example: 5.00
+ *                             notes:
+ *                               type: string
+ *                               example: "Sem cebola"
+ *                             createdAt:
+ *                               type: string
+ *                               format: date-time
+ *                               example: "2024-12-10T16:34:59.818Z"
+ *                             updatedAt:
+ *                               type: string
+ *                               format: date-time
+ *                               example: "2024-12-10T16:34:59.818Z"
+ *                             items:
+ *                               type: array
+ *                               items:
+ *                                 type: object
+ *                                 properties:
+ *                                   id:
+ *                                     type: integer
+ *                                     example: 1
+ *                                   name:
+ *                                     type: string
+ *                                     example: "Coca-Cola Zero"
+ *                                   price:
+ *                                     type: number
+ *                                     example: 6.99
+ *                                   quantity:
+ *                                     type: integer
+ *                                     example: 2
+ *       401:
+ *         description: Token inválido ou não fornecido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Token não autorizado.
+ *       500:
+ *         description: Erro ao buscar os deliveries.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Erro ao buscar deliveries.
  */
 
 /**

@@ -1,4 +1,5 @@
 const { Delivery, DeliveryOrder, Order, Item, Customer } = require("../models");
+const paginationService = require("../services/paginationService");
 const { formatterDelivery } = require("../utils/formatterDeliveries");
 
 const getDeliveriesByCompany = async (req, res) => {
@@ -9,8 +10,7 @@ const getDeliveriesByCompany = async (req, res) => {
   }
 
   try {
-    // Buscar todos os deliveries da empresa
-    const deliveries = await Delivery.findAll({
+    await paginationService(Delivery, {
       where: { company_id },
       include: [
         {
@@ -31,22 +31,21 @@ const getDeliveriesByCompany = async (req, res) => {
           ],
         },
       ],
+    })(req, res, () => {
+      // Formata os deliveries paginados
+      const formattedDeliveries = res.pagination.data.map((delivery) => {
+        return formatterDelivery(delivery);
+      });
+
+      // Retorna a resposta paginada
+      res.status(200).json({
+        currentPage: res.pagination.currentPage,
+        totalPages: res.pagination.totalPages,
+        totalItems: res.pagination.totalItems,
+        itemsPerPage: res.pagination.itemsPerPage,
+        data: formattedDeliveries,
+      });
     });
-
-    if (!deliveries || deliveries.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "Nenhum delivery encontrado para esta empresa." });
-    }
-
-
-
-    // Formatando a resposta para incluir as orders e itens
-    const formattedDeliveries = deliveries.map((delivery) => {
-      return formatterDelivery(delivery);
-    });
-
-    res.status(200).json(formattedDeliveries);
   } catch (error) {
     console.error("Erro ao buscar deliveries:", error);
     res.status(500).json({ error: "Erro ao buscar deliveries." });

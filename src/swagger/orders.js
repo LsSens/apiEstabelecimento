@@ -5,107 +5,157 @@
  *     summary: Retorna uma lista de pedidos com status e detalhes.
  *     tags:
  *       - Pedidos
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         description: Número da página para paginação.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - name: limit
+ *         in: query
+ *         description: Quantidade de pedidos por página.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 10
  *     responses:
  *       200:
  *         description: Lista de pedidos com detalhes.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 9
- *                   customer_id:
- *                     type: integer
- *                     example: 1
- *                   total:
- *                     type: number
- *                     example: 25.97
- *                   status:
- *                     type: string
- *                     example: PENDING
- *                   company_id:
- *                     type: integer
- *                     example: 1
- *                   payment_method:
- *                     type: string
- *                     example: credit_card
- *                   delivery_fee:
- *                     type: number
- *                     example: 5.00
- *                   notes:
- *                     type: string
- *                     example: "Sem cebola"
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                     example: "2024-12-10T16:34:59.818Z"
- *                   updatedAt:
- *                     type: string
- *                     format: date-time
- *                     example: "2024-12-10T16:34:59.818Z"
+ *               type: object
+ *               properties:
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalItems:
+ *                   type: integer
+ *                   example: 50
+ *                 itemsPerPage:
+ *                   type: integer
+ *                   example: 10
+ *                 data:
+ *                   type: array
  *                   items:
- *                     type: array
- *                     items:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: integer
- *                           example: 1
- *                         name:
- *                           type: string
- *                           example: "Coca-Cola Zero"
- *                         price:
- *                           type: string
- *                           example: "6.99"
- *                         quantity:
- *                           type: integer
- *                           example: 2
- *                   customer:
  *                     type: object
  *                     properties:
  *                       id:
  *                         type: integer
+ *                         example: 9
+ *                       customer_id:
+ *                         type: integer
  *                         example: 1
- *                       name:
+ *                       total:
+ *                         type: number
+ *                         example: 25.97
+ *                       status:
  *                         type: string
- *                         example: "João Silva"
- *                       email:
+ *                         example: PENDING
+ *                       company_id:
+ *                         type: integer
+ *                         example: 1
+ *                       payment_method:
  *                         type: string
- *                         example: "joao.silva@example.com"
- *                       address:
+ *                         example: credit_card
+ *                       delivery_fee:
+ *                         type: number
+ *                         example: 5.00
+ *                       notes:
+ *                         type: string
+ *                         example: "Sem cebola"
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-12-10T16:34:59.818Z"
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-12-10T16:34:59.818Z"
+ *                       items:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: integer
+ *                               example: 1
+ *                             name:
+ *                               type: string
+ *                               example: "Coca-Cola Zero"
+ *                             price:
+ *                               type: string
+ *                               example: "6.99"
+ *                             quantity:
+ *                               type: integer
+ *                               example: 2
+ *                       customer:
  *                         type: object
  *                         properties:
- *                           street:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *                           name:
  *                             type: string
- *                             example: "Rua Exemplo"
- *                           number:
+ *                             example: "João Silva"
+ *                           email:
  *                             type: string
- *                             example: "123"
- *                           city:
- *                             type: string
- *                             example: "São Paulo"
- *                           state:
- *                             type: string
- *                             example: "SP"
- *                           cep:
- *                             type: string
- *                             example: "11111-111"
- *                           lat:
- *                             type: string
- *                             example: "-41.12313131"
- *                           lng:
- *                             type: string
- *                             example: "-41.12313131"
- *                           neighborhood:
- *                             type: string
- *                             example: "Morumbi"
- *                           complement:
- *                             type: string
- *                             example: "apto 22"
+ *                             example: "joao.silva@example.com"
+ *                           address:
+ *                             type: object
+ *                             properties:
+ *                               street:
+ *                                 type: string
+ *                                 example: "Rua Exemplo"
+ *                               number:
+ *                                 type: string
+ *                                 example: "123"
+ *                               city:
+ *                                 type: string
+ *                                 example: "São Paulo"
+ *                               state:
+ *                                 type: string
+ *                                 example: "SP"
+ *                               cep:
+ *                                 type: string
+ *                                 example: "11111-111"
+ *                               lat:
+ *                                 type: string
+ *                                 example: "-41.12313131"
+ *                               lng:
+ *                                 type: string
+ *                                 example: "-41.12313131"
+ *                               neighborhood:
+ *                                 type: string
+ *                                 example: "Morumbi"
+ *                               complement:
+ *                                 type: string
+ *                                 example: "apto 22"
+ *       401:
+ *         description: Token inválido ou não fornecido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Token não autorizado.
+ *       500:
+ *         description: Erro ao buscar os pedidos.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Erro ao buscar pedidos.
  */
 
 /**

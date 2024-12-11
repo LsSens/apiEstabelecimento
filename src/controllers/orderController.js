@@ -6,6 +6,7 @@ const {
   OrderItems,
   CustomerCompany,
 } = require("../models");
+const paginationService = require("../services/paginationService");
 
 const getOrders = async (req, res) => {
   const { company_id } = req.user;
@@ -15,7 +16,7 @@ const getOrders = async (req, res) => {
   }
 
   try {
-    const orders = await Order.findAll({
+    await paginationService(Order, {
       where: { company_id },
       include: [
         {
@@ -30,19 +31,25 @@ const getOrders = async (req, res) => {
           attributes: ["id", "name", "email", "address"],
         },
       ],
+    })(req, res, () => {
+      const formattedOrders = res.pagination.data.map((order) => ({
+        ...order.toJSON(),
+        items: order.items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.OrderItems.quantity,
+        })),
+      }));
+
+      res.status(200).json({
+        currentPage: res.pagination.currentPage,
+        totalPages: res.pagination.totalPages,
+        totalItems: res.pagination.totalItems,
+        itemsPerPage: res.pagination.itemsPerPage,
+        data: formattedOrders,
+      });
     });
-
-    const formattedOrders = orders.map((order) => ({
-      ...order.toJSON(),
-      items: order.items.map((item) => ({
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: item.OrderItems.quantity,
-      })),
-    }));
-
-    return res.status(200).json(formattedOrders);
   } catch (error) {
     console.error("Erro ao buscar pedidos:", error);
     return res.status(500).json({ error: "Erro ao buscar pedidos." });

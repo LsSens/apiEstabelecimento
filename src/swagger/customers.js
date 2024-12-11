@@ -5,47 +5,77 @@
  *     summary: Lista todos os clientes relacionados a uma empresa.
  *     tags:
  *       - Clientes
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         description: Número da página para paginação.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - name: limit
+ *         in: query
+ *         description: Quantidade de clientes por página.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 10
  *     responses:
  *       200:
  *         description: Lista de clientes relacionados à empresa retornada com sucesso.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 1
- *                   name:
- *                     type: string
- *                     example: João Silva
- *                   email:
- *                     type: string
- *                     example: joao.silva@example.com
- *                   phone:
- *                     type: string
- *                     example: 11987654321
- *                   address:
+ *               type: object
+ *               properties:
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalItems:
+ *                   type: integer
+ *                   example: 50
+ *                 itemsPerPage:
+ *                   type: integer
+ *                   example: 10
+ *                 data:
+ *                   type: array
+ *                   items:
  *                     type: object
  *                     properties:
- *                       street:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       name:
  *                         type: string
- *                         example: Rua Exemplo
- *                       city:
+ *                         example: João Silva
+ *                       email:
  *                         type: string
- *                         example: São Paulo
- *                       state:
+ *                         example: joao.silva@example.com
+ *                       phone:
  *                         type: string
- *                         example: SP
- *                       zip:
+ *                         example: 11987654321
+ *                       address:
+ *                         type: object
+ *                         properties:
+ *                           street:
+ *                             type: string
+ *                             example: Rua Exemplo
+ *                           city:
+ *                             type: string
+ *                             example: São Paulo
+ *                           state:
+ *                             type: string
+ *                             example: SP
+ *                           zip:
+ *                             type: string
+ *                             example: 12345-678
+ *                       createdAt:
  *                         type: string
- *                         example: 12345-678
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                     example: "2024-12-10T00:00:00.000Z"
+ *                         format: date-time
+ *                         example: "2024-12-10T00:00:00.000Z"
  *       401:
  *         description: Token inválido ou não fornecido.
  *         content:

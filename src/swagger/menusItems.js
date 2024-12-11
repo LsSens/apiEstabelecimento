@@ -5,35 +5,65 @@
  *     summary: Retorna todos os itens associados ao company_id do usuário autenticado.
  *     tags:
  *       - Cardápio - Items
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         description: Número da página para paginação.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - name: limit
+ *         in: query
+ *         description: Quantidade de itens por página.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 10
  *     responses:
  *       200:
  *         description: Lista de itens associados ao company_id.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                     example: 1
- *                   name:
- *                     type: string
- *                     example: Coca-Cola
- *                   description:
- *                     type: string
- *                     example: Very good
- *                   price:
- *                     type: number
- *                     format: float
- *                     example: 5.99
- *                   available:
- *                     type: boolean
- *                     example: true
- *                   image:
- *                     type: string
- *                     example: https://example.com/image.png
+ *               type: object
+ *               properties:
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalItems:
+ *                   type: integer
+ *                   example: 50
+ *                 itemsPerPage:
+ *                   type: integer
+ *                   example: 10
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       name:
+ *                         type: string
+ *                         example: Coca-Cola
+ *                       description:
+ *                         type: string
+ *                         example: Very good
+ *                       price:
+ *                         type: number
+ *                         format: float
+ *                         example: 5.99
+ *                       available:
+ *                         type: boolean
+ *                         example: true
+ *                       image:
+ *                         type: string
+ *                         example: https://example.com/image.png
  *       500:
  *         description: Erro ao buscar itens.
  */

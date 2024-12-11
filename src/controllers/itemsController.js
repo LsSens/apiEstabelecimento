@@ -1,15 +1,35 @@
 const { Item } = require("../models");
+const paginationService = require("../services/paginationService");
 
 const getItems = async (req, res) => {
   const { company_id } = req.user;
 
+  if (!company_id) {
+    return res.status(401).json({ error: "Acesso negado. Empresa não identificada." });
+  }
+
   try {
-    const items = await Item.findAll({
+    await paginationService(Item, {
       where: { company_id },
       attributes: ["id", "name", "description", "price", "available", "image"],
-    });
+    })(req, res, () => {
+      const formattedItems = res.pagination.data.map((item) => ({
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        available: item.available,
+        image: item.image,
+      }));
 
-    res.status(200).json(items);
+      res.status(200).json({
+        currentPage: res.pagination.currentPage,
+        totalPages: res.pagination.totalPages,
+        totalItems: res.pagination.totalItems,
+        itemsPerPage: res.pagination.itemsPerPage,
+        data: formattedItems,
+      });
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erro ao buscar itens." });

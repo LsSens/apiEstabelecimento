@@ -1,6 +1,7 @@
 const { Customer, CustomerCompany } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const paginationService = require("../services/paginationService");
 
 const getCustomersByCompany = async (req, res) => {
   const { company_id } = req.user;
@@ -10,7 +11,7 @@ const getCustomersByCompany = async (req, res) => {
   }
 
   try {
-    const customerCompanies = await CustomerCompany.findAll({
+    await paginationService(CustomerCompany, {
       where: { company_id },
       include: [
         {
@@ -27,13 +28,19 @@ const getCustomersByCompany = async (req, res) => {
           ],
         },
       ],
+    })(req, res, () => {
+      const customers = res.pagination.data.map((relation) => relation.customer);
+
+      res.status(200).json({
+        currentPage: res.pagination.currentPage,
+        totalPages: res.pagination.totalPages,
+        totalItems: res.pagination.totalItems,
+        itemsPerPage: res.pagination.itemsPerPage,
+        data: customers,
+      });
     });
-
-    const customers = customerCompanies.map((relation) => relation.customer);
-
-    res.status(200).json(customers);
   } catch (error) {
-    console.error(error);
+    console.error("Erro ao buscar clientes:", error);
     res.status(500).json({
       error: "Erro ao buscar clientes relacionados à empresa.",
     });
