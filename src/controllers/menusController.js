@@ -20,6 +20,7 @@ const getMenus = async (req, res) => {
           through: { attributes: [] },
         },
       ],
+      order: [["menu_name", "ASC"]],
     })(req, res, () => {
       const formattedMenus = res.pagination.data.map((menu) => ({
         menu_id: menu.id,
