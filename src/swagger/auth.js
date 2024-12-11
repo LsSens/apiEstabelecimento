@@ -31,7 +31,7 @@
  *                   example: jwt_token_gerado
  *                 expiresIn:
  *                   type: number
- *                   example: 36000
+ *                   example: 3600
  *                 permissions:
  *                   type: array
  *                   items:
