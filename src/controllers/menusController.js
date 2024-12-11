@@ -1,11 +1,16 @@
 const { Menus, Item, MenuItems } = require("../models");
 const uploadToImgur = require("../services/imgurService");
+const paginationService = require("../services/paginationService");
 
 const getMenus = async (req, res) => {
   const { company_id } = req.user;
 
+  if (!company_id) {
+    return res.status(401).json({ error: "Acesso negado. Empresa não identificada." });
+  }
+
   try {
-    const menus = await Menus.findAll({
+    await paginationService(Menus, {
       where: { company_id },
       include: [
         {
@@ -15,23 +20,29 @@ const getMenus = async (req, res) => {
           through: { attributes: [] },
         },
       ],
+    })(req, res, () => {
+      const formattedMenus = res.pagination.data.map((menu) => ({
+        menu_id: menu.id,
+        menu_name: menu.menu_name,
+        menu_image: menu.image,
+        items: menu.items.slice(0, 3).map((item) => ({
+          item_id: item.id,
+          name: item.name,
+          price: item.price,
+          available: item.available,
+        })),
+      }));
+
+      res.status(200).json({
+        currentPage: res.pagination.currentPage,
+        totalPages: res.pagination.totalPages,
+        totalItems: res.pagination.totalItems,
+        itemsPerPage: res.pagination.itemsPerPage,
+        data: formattedMenus,
+      });
     });
-
-    const formattedMenus = menus.map((menu) => ({
-      menu_id: menu.id,
-      menu_name: menu.menu_name,
-      menu_image: menu.image,
-      items: menu.items.slice(0, 3).map((item) => ({
-        item_id: item.id,
-        name: item.name,
-        price: item.price,
-        available: item.available,
-      })),
-    }));
-
-    res.status(200).json(formattedMenus);
   } catch (error) {
-    console.error(error);
+    console.error("Erro ao buscar os menus:", error);
     res.status(500).json({ error: "Erro ao buscar os menus." });
   }
 };
@@ -59,11 +70,13 @@ const getMenuById = async (req, res) => {
     const formattedMenu = {
       menu_id: menu.id,
       menu_name: menu.menu_name,
+      menu_image: menu.image,
       items: menu.items.map((item) => ({
         item_id: item.id,
         name: item.name,
         price: item.price,
         available: item.available,
+        item_image: item.image
       })),
     };
 

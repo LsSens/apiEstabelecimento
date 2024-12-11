@@ -5,40 +5,76 @@
  *     summary: Retorna o cardápio completo do estabelecimento.
  *     tags:
  *       - Cardápio - Menus
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         description: Número da página para paginação.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - name: limit
+ *         in: query
+ *         description: Quantidade de itens por página.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 10
  *     responses:
  *       200:
- *         description: Lista de categorias e itens.
+ *         description: Lista de categorias e itens paginada.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   menu_id:
- *                     type: integer
- *                     example: 1
- *                   menu_name:
- *                     type: string
- *                     example: Bebidas
+ *               type: object
+ *               properties:
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 totalItems:
+ *                   type: integer
+ *                   example: 50
+ *                 itemsPerPage:
+ *                   type: integer
+ *                   example: 10
+ *                 data:
+ *                   type: array
  *                   items:
- *                     type: array
- *                     items:
- *                       type: object
- *                       properties:
- *                         item_id:
- *                           type: integer
- *                           example: 101
- *                         name:
- *                           type: string
- *                           example: Coca-Cola
- *                         price:
- *                           type: number
- *                           example: 5.99
- *                         available:
- *                           type: boolean
- *                           example: true
+ *                     type: object
+ *                     properties:
+ *                       menu_id:
+ *                         type: integer
+ *                         example: 1
+ *                       menu_name:
+ *                         type: string
+ *                         example: Bebidas
+ *                       menu_image:
+ *                         type: string
+ *                         example: https://example.com/menu1.jpg
+ *                       items:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             item_id:
+ *                               type: integer
+ *                               example: 101
+ *                             name:
+ *                               type: string
+ *                               example: Coca-Cola
+ *                             price:
+ *                               type: number
+ *                               example: 5.99
+ *                             available:
+ *                               type: boolean
+ *                               example: true
+ *       500:
+ *         description: Erro interno do servidor.
  */
+
 /**
  * @swagger
  * /menus/{menu_id}:
