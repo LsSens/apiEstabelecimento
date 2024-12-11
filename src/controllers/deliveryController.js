@@ -1,4 +1,4 @@
-const { Delivery, DeliveryOrder, Order, Item } = require("../models");
+const { Delivery, DeliveryOrder, Order, Item, Customer } = require("../models");
 const { formatterDelivery } = require("../utils/formatterDeliveries");
 
 const getDeliveriesByCompany = async (req, res) => {
@@ -21,7 +21,12 @@ const getDeliveriesByCompany = async (req, res) => {
               model: Item,
               as: "items",
               attributes: ["id", "name", "price"],
-              through: { attributes: ["quantity"] }, // Para incluir a quantidade
+              through: { attributes: ["quantity"] },
+            },
+            {
+              model: Customer,
+              as: "customer",
+              attributes: ["id", "name", "email", "address"],
             },
           ],
         },
@@ -33,6 +38,8 @@ const getDeliveriesByCompany = async (req, res) => {
         .status(404)
         .json({ error: "Nenhum delivery encontrado para esta empresa." });
     }
+
+
 
     // Formatando a resposta para incluir as orders e itens
     const formattedDeliveries = deliveries.map((delivery) => {

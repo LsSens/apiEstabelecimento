@@ -47,7 +47,7 @@ const getMenuById = async (req, res) => {
         {
           model: Item,
           as: "items",
-          attributes: ["id", "name", "price", "available"],
+          attributes: ["id", "name", "price", "available", "image"],
         },
       ],
     });

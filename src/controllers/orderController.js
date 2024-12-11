@@ -56,8 +56,7 @@ const createOrder = async (req, res) => {
     company_id = req.body.company_id;
   }
 
-  const { customer_id, items, total, payment_method, delivery_fee, notes } =
-    req.body;
+  const { customer, items, total, payment_method, delivery_fee, notes } = req.body;
 
   try {
     const companyExists = await Company.findByPk(company_id);
@@ -65,9 +64,24 @@ const createOrder = async (req, res) => {
       return res.status(404).json({ error: "Empresa não encontrada." });
     }
 
-    const customerExists = await Customer.findByPk(customer_id);
-    if (!customerExists) {
-      return res.status(400).json({ error: "Cliente não encontrado." });
+    const existingCustomer = await Customer.findOne({
+      where: {
+        name: customer.name,
+        address: customer.address,
+      },
+    });
+
+    let customerId;
+    if (existingCustomer) {
+      customerId = existingCustomer.id;
+    } else {
+      const newCustomer = await Customer.create({
+        name: customer.name,
+        email: customer.email || null,
+        address: JSON.stringify(customer.address),
+        phone: customer.phone || null,
+      });
+      customerId = newCustomer.id;
     }
 
     const itemIds = items.map((item) => item.item_id);
@@ -87,7 +101,7 @@ const createOrder = async (req, res) => {
     }
 
     const order = await Order.create({
-      customer_id,
+      customer_id: customerId,
       company_id,
       total,
       status: "PENDING",
@@ -107,11 +121,11 @@ const createOrder = async (req, res) => {
     }
 
     const customerCompanyExists = await CustomerCompany.findOne({
-      where: { customer_id, company_id },
+      where: { customer_id: customerId, company_id },
     });
 
     if (!customerCompanyExists) {
-      await CustomerCompany.create({ customer_id, company_id });
+      await CustomerCompany.create({ customer_id: customerId, company_id });
     }
 
     const createdOrder = await Order.findByPk(order.id, {

@@ -11,7 +11,6 @@ function formatterDelivery(delivery) {
     deletedAt: delivery.deletedAt,
     orders: delivery.orders.map((order) => ({
       id: order.id,
-      customer_id: order.customer_id,
       total: order.total,
       status: order.status,
       company_id: order.company_id,
@@ -20,6 +19,7 @@ function formatterDelivery(delivery) {
       notes: order.notes,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
+      customer: order.customer,
       items: order.items.map((item) => ({
         id: item.id,
         name: item.name,

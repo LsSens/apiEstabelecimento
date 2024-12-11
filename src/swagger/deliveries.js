@@ -17,6 +17,9 @@
  *                 properties:
  *                   id:
  *                     type: integer
+ *                     example: 8
+ *                   company_id:
+ *                     type: integer
  *                     example: 1
  *                   delivery_status:
  *                     type: string
@@ -30,11 +33,16 @@
  *                   createdAt:
  *                     type: string
  *                     format: date-time
- *                     example: "2024-12-10T16:43:02.115Z"
+ *                     example: "2024-12-11T05:26:46.605Z"
  *                   updatedAt:
  *                     type: string
  *                     format: date-time
- *                     example: "2024-12-10T16:43:02.115Z"
+ *                     example: "2024-12-11T05:26:46.605Z"
+ *                   deletedAt:
+ *                     type: string
+ *                     format: date-time
+ *                     nullable: true
+ *                     example: null
  *                   orders:
  *                     type: array
  *                     items:
@@ -42,10 +50,36 @@
  *                       properties:
  *                         id:
  *                           type: integer
- *                           example: 101
+ *                           example: 9
+ *                         customer_id:
+ *                           type: integer
+ *                           example: 1
  *                         total:
  *                           type: number
- *                           example: 100.50
+ *                           example: 25.97
+ *                         status:
+ *                           type: string
+ *                           example: "PENDING"
+ *                         company_id:
+ *                           type: integer
+ *                           example: 1
+ *                         payment_method:
+ *                           type: string
+ *                           example: "credit_card"
+ *                         delivery_fee:
+ *                           type: number
+ *                           example: 5.00
+ *                         notes:
+ *                           type: string
+ *                           example: "Sem cebola"
+ *                         createdAt:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2024-12-10T16:34:59.818Z"
+ *                         updatedAt:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2024-12-10T16:34:59.818Z"
  *                         items:
  *                           type: array
  *                           items:
@@ -56,108 +90,13 @@
  *                                 example: 1
  *                               name:
  *                                 type: string
- *                                 example: "Item A"
+ *                                 example: "Coca-Cola Zero"
  *                               price:
  *                                 type: number
- *                                 example: 50.00
+ *                                 example: 6.99
  *                               quantity:
  *                                 type: integer
  *                                 example: 2
- */
-
-/**
- * @swagger
- * /deliveries:
- *   post:
- *     summary: Cria um novo delivery e relaciona orders a ele.
- *     tags:
- *       - Deliveries
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               company_id:
- *                 type: integer
- *                 example: 1
- *               orders:
- *                 type: array
- *                 items:
- *                   type: integer
- *                 example: [101, 102]
- *               total_cost:
- *                 type: number
- *                 example: 200.50
- *               total_fee:
- *                 type: number
- *                 example: 15.00
- *     responses:
- *       201:
- *         description: Delivery criado com sucesso.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Delivery criado com sucesso."
- *                 delivery:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                       example: 1
- *                     company_id:
- *                       type: integer
- *                       example: 1
- *                     delivery_status:
- *                       type: string
- *                       example: "PENDING"
- *                     total_cost:
- *                       type: number
- *                       example: 200.50
- *                     total_fee:
- *                       type: number
- *                       example: 15.00
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                       example: "2024-12-10T16:43:02.115Z"
- *                     updatedAt:
- *                       type: string
- *                       format: date-time
- *                       example: "2024-12-10T16:43:02.115Z"
- *                     orders:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           id:
- *                             type: integer
- *                             example: 101
- *                           total:
- *                             type: number
- *                             example: 100.50
- *                           items:
- *                             type: array
- *                             items:
- *                               type: object
- *                               properties:
- *                                 id:
- *                                   type: integer
- *                                   example: 1
- *                                 name:
- *                                   type: string
- *                                   example: "Item A"
- *                                 price:
- *                                   type: number
- *                                   example: 50.00
- *                                 quantity:
- *                                   type: integer
- *                                   example: 2
  */
 
 /**
@@ -184,6 +123,9 @@
  *               properties:
  *                 id:
  *                   type: integer
+ *                   example: 8
+ *                 company_id:
+ *                   type: integer
  *                   example: 1
  *                 delivery_status:
  *                   type: string
@@ -197,11 +139,11 @@
  *                 createdAt:
  *                   type: string
  *                   format: date-time
- *                   example: "2024-12-10T16:43:02.115Z"
+ *                   example: "2024-12-11T05:26:46.605Z"
  *                 updatedAt:
  *                   type: string
  *                   format: date-time
- *                   example: "2024-12-10T16:43:02.115Z"
+ *                   example: "2024-12-11T05:26:46.605Z"
  *                 orders:
  *                   type: array
  *                   items:
@@ -209,10 +151,10 @@
  *                     properties:
  *                       id:
  *                         type: integer
- *                         example: 101
+ *                         example: 9
  *                       total:
  *                         type: number
- *                         example: 100.50
+ *                         example: 25.97
  *                       items:
  *                         type: array
  *                         items:
@@ -223,13 +165,108 @@
  *                               example: 1
  *                             name:
  *                               type: string
- *                               example: "Item A"
+ *                               example: "Coca-Cola Zero"
  *                             price:
  *                               type: number
- *                               example: 50.00
+ *                               example: 6.99
  *                             quantity:
  *                               type: integer
  *                               example: 2
  *       404:
  *         description: Delivery não encontrado.
+ */
+
+/**
+ * @swagger
+ * /deliveries:
+ *   post:
+ *     summary: Cria um novo delivery e relaciona orders a ele.
+ *     tags:
+ *       - Deliveries
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               company_id:
+ *                 type: integer
+ *                 example: 1
+ *               orders:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 example: [9, 10]
+ *               total_cost:
+ *                 type: number
+ *                 example: 200.50
+ *               total_fee:
+ *                 type: number
+ *                 example: 15.00
+ *     responses:
+ *       201:
+ *         description: Delivery criado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Delivery criado com sucesso."
+ *                 delivery:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 8
+ *                     company_id:
+ *                       type: integer
+ *                       example: 1
+ *                     delivery_status:
+ *                       type: string
+ *                       example: "PENDING"
+ *                     total_cost:
+ *                       type: number
+ *                       example: 200.50
+ *                     total_fee:
+ *                       type: number
+ *                       example: 15.00
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-12-11T05:26:46.605Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-12-11T05:26:46.605Z"
+ *                     orders:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 9
+ *                           total:
+ *                             type: number
+ *                             example: 25.97
+ *                           items:
+ *                             type: array
+ *                             items:
+ *                               type: object
+ *                               properties:
+ *                                 id:
+ *                                   type: integer
+ *                                   example: 1
+ *                                 name:
+ *                                   type: string
+ *                                   example: "Coca-Cola Zero"
+ *                                 price:
+ *                                   type: number
+ *                                   example: 6.99
+ *                                 quantity:
+ *                                   type: integer
+ *                                   example: 2
  */
