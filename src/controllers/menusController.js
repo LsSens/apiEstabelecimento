@@ -1,5 +1,5 @@
 const { Menus, Item, MenuItems } = require("../models");
-const uploadToImgur = require("../images/imgur");
+const uploadToImgur = require("../services/imgurService");
 
 const getMenus = async (req, res) => {
   const { company_id } = req.user;
