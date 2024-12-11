@@ -26,23 +26,81 @@
  *             schema:
  *               type: object
  *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     email:
+ *                       type: string
+ *                       example: admin@company.com
+ *                     name:
+ *                       type: string
+ *                       example: Admin User
+ *                     phone:
+ *                       type: string
+ *                       example: 123456789
+ *                     permission:
+ *                       type: string
+ *                       example: null
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-12-10T16:13:32.607Z"
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2024-12-10T16:13:32.607Z"
+ *                     company:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                           example: 1
+ *                         name:
+ *                           type: string
+ *                           example: Empresa Exemplo
+ *                         cnpj:
+ *                           type: string
+ *                           example: 12345678000195
+ *                         address:
+ *                           type: object
+ *                           properties:
+ *                             street:
+ *                               type: string
+ *                               example: Rua Exemplo
+ *                             number:
+ *                               type: string
+ *                               example: 123
+ *                             city:
+ *                               type: string
+ *                               example: São Paulo
+ *                             state:
+ *                               type: string
+ *                               example: SP
+ *                         createdAt:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2024-12-03T16:31:18.810Z"
+ *                         updatedAt:
+ *                           type: string
+ *                           format: date-time
+ *                           example: "2024-12-03T16:31:18.810Z"
  *                 token:
  *                   type: string
- *                   example: jwt_token_gerado
+ *                   example: token_gerado
  *                 expiresIn:
  *                   type: number
  *                   example: 3600
- *                 permissions:
- *                   type: array
- *                   items:
- *                     type: string
- *                     example: admin
  *                 message:
  *                   type: string
  *                   example: Login realizado com sucesso.
  *       401:
  *         description: Credenciais inválidas.
  */
+
+
 /**
  * @swagger
  * /auth/register:

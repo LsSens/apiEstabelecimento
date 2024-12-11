@@ -35,7 +35,7 @@ const registerUser = async (req, res) => {
       company_id: newCompany.id,
     });
 
-    const expiresIn = 60 * 60 * 1;
+    const expiresIn = 60 * 60;
 
     const token = jwt.sign(
       {
@@ -69,19 +69,27 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password: requestPassword } = req.body;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      where: { email },
+      include: [
+        {
+          model: Company,
+          as: "company",
+        }
+      ]
+    });
     if (!user) {
       return res.status(401).json({ error: "E-mail ou senha inválidos." });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(requestPassword, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ error: "E-mail ou senha inválidos." });
     }
 
-    const expiresIn = 60 * 60 * 1;
+    const expiresIn = 60 * 60;
 
     const token = jwt.sign(
       {
@@ -93,15 +101,22 @@ const loginUser = async (req, res) => {
       { expiresIn }
     );
 
-    res.status(200).json({
+    const { password, company_id, ...userWithoutPassword } = user.toJSON();
+
+    return res.status(200).json({
+      data: {
+        ...userWithoutPassword,
+        company: user.company,
+      },
       token,
       expiresIn,
       permissions: user.permissions,
       message: "Login realizado com sucesso.",
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erro ao fazer login." });
+    if (!res.headersSent) {
+      return res.status(500).json({ error: "Erro ao fazer login." });
+    }
   }
 };
 
@@ -185,7 +200,6 @@ const resetPassword = async (req, res) => {
       message: "Senha redefinida com sucesso.",
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       error: "Erro ao redefinir a senha.",
     });

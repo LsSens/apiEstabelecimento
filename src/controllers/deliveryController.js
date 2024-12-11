@@ -70,6 +70,11 @@ const getDeliveryById = async (req, res) => {
               attributes: ["id", "name", "price"],
               through: { attributes: ["quantity"] },
             },
+            {
+              model: Customer,
+              as: "customer",
+              attributes: ["id", "name", "email", "address"],
+            },
           ],
         },
       ],
@@ -161,6 +166,11 @@ const createDelivery = async (req, res) => {
               as: "items",
               attributes: ["id", "name", "price"],
               through: { attributes: ["quantity"] },
+            },
+            {
+              model: Customer,
+              as: "customer",
+              attributes: ["id", "name", "email", "address"],
             },
           ],
         },
