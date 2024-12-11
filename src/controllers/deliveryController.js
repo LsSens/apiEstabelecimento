@@ -1,10 +1,4 @@
-const {
-  Delivery,
-  DeliveryOrder,
-  Order,
-  Item,
-  Sequelize,
-} = require("../models");
+const { Delivery, DeliveryOrder, Order, Item } = require("../models");
 const { formatterDelivery } = require("../utils/formatterDeliveries");
 
 const getDeliveriesByCompany = async (req, res) => {
@@ -52,8 +46,39 @@ const getDeliveriesByCompany = async (req, res) => {
   }
 };
 
-module.exports = {
-  getDeliveriesByCompany,
+const getDeliveryById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Buscar o delivery com as orders associadas
+    const delivery = await Delivery.findByPk(id, {
+      include: [
+        {
+          model: Order,
+          as: "orders",
+          include: [
+            {
+              model: Item,
+              as: "items",
+              attributes: ["id", "name", "price"],
+              through: { attributes: ["quantity"] },
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!delivery) {
+      return res.status(404).json({ error: "Delivery não encontrado." });
+    }
+
+    const formattedDelivery = formatterDelivery(delivery);
+
+    res.status(200).json(formattedDelivery);
+  } catch (error) {
+    console.error("Erro ao buscar delivery:", error);
+    res.status(500).json({ error: "Erro ao buscar delivery." });
+  }
 };
 
 const createDelivery = async (req, res) => {
@@ -144,41 +169,6 @@ const createDelivery = async (req, res) => {
   } catch (error) {
     console.error("Erro ao criar delivery:", error);
     res.status(500).json({ error: "Erro ao criar delivery." });
-  }
-};
-
-const getDeliveryById = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    // Buscar o delivery com as orders associadas
-    const delivery = await Delivery.findByPk(id, {
-      include: [
-        {
-          model: Order,
-          as: "orders",
-          include: [
-            {
-              model: Item,
-              as: "items",
-              attributes: ["id", "name", "price"],
-              through: { attributes: ["quantity"] },
-            },
-          ],
-        },
-      ],
-    });
-
-    if (!delivery) {
-      return res.status(404).json({ error: "Delivery não encontrado." });
-    }
-
-    const formattedDelivery = formatterDelivery(delivery);
-
-    res.status(200).json(formattedDelivery);
-  } catch (error) {
-    console.error("Erro ao buscar delivery:", error);
-    res.status(500).json({ error: "Erro ao buscar delivery." });
   }
 };
 
