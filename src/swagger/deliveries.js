@@ -240,20 +240,11 @@
  *           schema:
  *             type: object
  *             properties:
- *               company_id:
- *                 type: integer
- *                 example: 1
  *               orders:
  *                 type: array
  *                 items:
  *                   type: integer
  *                 example: [9, 10]
- *               total_cost:
- *                 type: number
- *                 example: 200.50
- *               total_fee:
- *                 type: number
- *                 example: 15.00
  *     responses:
  *       201:
  *         description: Delivery criado com sucesso.
@@ -319,4 +310,62 @@
  *                                 quantity:
  *                                   type: integer
  *                                   example: 2
+ */
+
+/**
+ * @swagger
+ * /deliveries/{deliveryId}:
+ *   delete:
+ *     summary: Cancela um delivery alterando seu status e o dos pedidos relacionados para "CANCELED", adicionando a data no campo deletedAt.
+ *     tags:
+ *       - Deliveries
+ *     parameters:
+ *       - in: path
+ *         name: deliveryId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 8
+ *         description: ID do delivery a ser cancelado.
+ *     responses:
+ *       200:
+ *         description: Delivery cancelado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Delivery cancelado com sucesso.
+ *       404:
+ *         description: Delivery não encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Delivery não encontrado.
+ *       401:
+ *         description: Token inválido ou não fornecido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Token não autorizado.
+ *       500:
+ *         description: Erro ao cancelar o delivery.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Erro ao cancelar o delivery.
  */

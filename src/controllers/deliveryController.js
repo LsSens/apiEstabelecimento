@@ -93,7 +93,10 @@ const getDeliveryById = async (req, res) => {
 };
 
 const createDelivery = async (req, res) => {
-  const { company_id, orders, total_cost, total_fee } = req.body;
+  const { orders } = req.body;
+  const { company_id } = req.user;
+  let total_cost = 0
+  let total_fee = 0
 
   if (!Array.isArray(orders) || orders.length === 0) {
     return res
@@ -119,6 +122,19 @@ const createDelivery = async (req, res) => {
       return res.status(400).json({ error: "Alguns pedidos são inválidos." });
     }
 
+    // Verificar se todos os pedidos têm status PENDING
+    const nonPendingOrders = validOrders.filter(
+      (order) => order.status !== "PENDING"
+    );
+
+    if (nonPendingOrders.length > 0) {
+      return res.status(400).json({
+        error: `Os pedidos com ID ${nonPendingOrders
+          .map((order) => order.id)
+          .join(", ")} não estão com status PENDING.`,
+      });
+    }
+
     // Verificar se as orders já estão associadas a outros deliveries
     const existingOrdersInOtherDeliveries = await DeliveryOrder.findAll({
       where: {
@@ -142,7 +158,7 @@ const createDelivery = async (req, res) => {
       company_id,
       total_cost,
       total_fee,
-      delivery_status: "DELIVERING",
+      delivery_status: "PREPARING",
     });
 
     // Relacionar orders ao delivery na tabela delivery_orders
@@ -153,9 +169,9 @@ const createDelivery = async (req, res) => {
 
     await DeliveryOrder.bulkCreate(deliveryOrders);
 
-    // Atualizar status das orders para "DELIVERING"
+    // Atualizar status das orders para "PREPARING"
     await Order.update(
-      { status: "DELIVERING" },
+      { status: "PREPARING" },
       { where: { id: orders } }
     );
 
@@ -194,8 +210,51 @@ const createDelivery = async (req, res) => {
   }
 };
 
+const cancelDelivery = async (req, res) => {
+  const { deliveryId } = req.params;
+  const { company_id } = req.user;
+
+  if (!company_id) {
+    return res.status(401).json({ error: "Acesso negado. Token inválido." });
+  }
+
+  try {
+    // Buscar o delivery e verificar se pertence à empresa
+    const delivery = await Delivery.findOne({
+      where: { id: deliveryId, company_id },
+      include: [
+        {
+          model: Order,
+          as: "orders",
+        },
+      ],
+    });
+
+    if (!delivery) {
+      return res.status(404).json({ error: "Delivery não encontrado." });
+    }
+
+    await Delivery.update(
+      { delivery_status: "CANCELED", deletedAt: new Date() },
+      { where: { id: deliveryId } }
+    );
+
+    const orderIds = delivery.orders.map((order) => order.id);
+    await Order.update(
+      { status: "CANCELED", deletedAt: new Date() },
+      { where: { id: orderIds } }
+    );
+
+    res.status(200).json({ message: "Delivery cancelado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao cancelar delivery:", error);
+    res.status(500).json({ error: "Erro ao cancelar delivery." });
+  }
+};
+
 module.exports = {
   createDelivery,
   getDeliveryById,
   getDeliveriesByCompany,
+  cancelDelivery
 };

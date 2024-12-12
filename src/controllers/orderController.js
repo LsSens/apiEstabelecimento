@@ -5,8 +5,10 @@ const {
   Company,
   OrderItems,
   CustomerCompany,
+  DeliveryOrder
 } = require("../models");
 const paginationService = require("../services/paginationService");
+const { formatterOrder } = require("../utils/formatterOrders");
 
 const getOrders = async (req, res) => {
   const { company_id } = req.user;
@@ -30,17 +32,16 @@ const getOrders = async (req, res) => {
           as: "customer",
           attributes: ["id", "name", "email", "address"],
         },
+        {
+          model: DeliveryOrder,
+          as: "deliveryOrder",
+          attributes: ["delivery_id"],
+        },
       ],
     })(req, res, () => {
-      const formattedOrders = res.pagination.data.map((order) => ({
-        ...order.toJSON(),
-        items: order.items.map((item) => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.OrderItems.quantity,
-        })),
-      }));
+      const formattedOrders = res.pagination.data.map((order) => {
+        return formatterOrder(order)
+      });
 
       res.status(200).json({
         currentPage: res.pagination.currentPage,
@@ -163,4 +164,33 @@ const createOrder = async (req, res) => {
   }
 };
 
-module.exports = { getOrders, createOrder };
+const deleteOrder = async (req, res) => {
+  const { orderId } = req.params;
+  const { company_id } = req.user;
+
+  if (!company_id) {
+    return res.status(401).json({ error: "Acesso negado. Token inválido." });
+  }
+
+  try {
+    const order = await Order.findOne({
+      where: { id: orderId, company_id },
+    });
+
+    if (!order) {
+      return res.status(404).json({ error: "Pedido não encontrado." });
+    }
+
+    await order.update({
+      status: "CANCELED",
+      deletedAt: new Date(),
+    });
+
+    return res.status(200).json({ message: "Pedido cancelado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao cancelar pedido:", error);
+    return res.status(500).json({ error: "Erro ao cancelar pedido." });
+  }
+};
+
+module.exports = { getOrders, createOrder, deleteOrder };

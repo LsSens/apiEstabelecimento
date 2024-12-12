@@ -48,6 +48,9 @@
  *                       id:
  *                         type: integer
  *                         example: 9
+ *                       deliver_id:
+ *                         type: integer
+ *                         example: 19
  *                       customer_id:
  *                         type: integer
  *                         example: 1
@@ -333,4 +336,62 @@
  *                       quantity:
  *                         type: integer
  *                         example: 2
+ */
+
+/**
+ * @swagger
+ * /orders/{orderId}:
+ *   delete:
+ *     summary: Cancela um pedido alterando o status para "CANCELED" e adiciona a data no campo deletedAt.
+ *     tags:
+ *       - Pedidos
+ *     parameters:
+ *       - name: orderId
+ *         in: path
+ *         description: ID do pedido a ser cancelado.
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Pedido cancelado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Pedido cancelado com sucesso.
+ *       404:
+ *         description: Pedido não encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Pedido não encontrado.
+ *       401:
+ *         description: Token inválido ou não fornecido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Token não autorizado.
+ *       500:
+ *         description: Erro ao cancelar o pedido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Erro ao cancelar o pedido.
  */
