@@ -127,6 +127,7 @@
  *       500:
  *         description: Erro interno do servidor.
  */
+
 /**
  * @swagger
  * /menus:
@@ -156,15 +157,15 @@
 /**
  * @swagger
  * /menus/{menu_id}/items:
- *   post:
- *     summary: Adiciona itens ao menu.
+ *   put:
+ *     summary: Vincula itens ao menu.
  *     tags:
  *       - Cardápio - Menus
  *     parameters:
  *       - name: menu_id
  *         in: path
  *         required: true
- *         description: ID do menu onde os itens serão adicionados.
+ *         description: ID do menu onde os itens serão vinculados.
  *         schema:
  *           type: integer
  *     requestBody:
@@ -174,33 +175,15 @@
  *           schema:
  *             type: object
  *             properties:
- *               items:
+ *               item_ids:
  *                 type: array
- *                 description: Lista de itens a serem adicionados ao menu.
+ *                 description: Lista de IDs dos itens a serem vinculados ao menu.
  *                 items:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                       description: Nome do item.
- *                       example: Coca-Cola
- *                     price:
- *                       type: number
- *                       format: float
- *                       description: Preço do item.
- *                       example: 5.99
- *                     available:
- *                       type: boolean
- *                       description: Indica se o item está disponível.
- *                       example: true
- *                     image:
- *                       type: string
- *                       format: uri
- *                       description: URL da imagem do item (opcional).
- *                       example: https://example.com/image.png
+ *                   type: integer
+ *                   example: 1
  *     responses:
  *       201:
- *         description: Itens adicionados ao menu com sucesso.
+ *         description: Itens vinculados ao menu com sucesso.
  *         content:
  *           application/json:
  *             schema:
@@ -208,35 +191,21 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Itens adicionados ao menu com sucesso.
+ *                   example: Itens vinculados ao menu com sucesso.
  *                 items:
  *                   type: array
- *                   description: Lista de itens adicionados.
+ *                   description: Lista de relacionamentos criados.
  *                   items:
  *                     type: object
  *                     properties:
- *                       id:
+ *                       menu_id:
+ *                         type: integer
+ *                         description: ID do menu.
+ *                         example: 5
+ *                       item_id:
  *                         type: integer
  *                         description: ID do item.
  *                         example: 1
- *                       name:
- *                         type: string
- *                         description: Nome do item.
- *                         example: Coca-Cola
- *                       price:
- *                         type: number
- *                         format: float
- *                         description: Preço do item.
- *                         example: 5.99
- *                       available:
- *                         type: boolean
- *                         description: Indica se o item está disponível.
- *                         example: true
- *                       image:
- *                         type: string
- *                         format: uri
- *                         description: URL da imagem do item.
- *                         example: https://example.com/image.png
  *       400:
  *         description: Requisição inválida. O payload pode estar incorreto.
  *         content:
@@ -246,7 +215,7 @@
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Os itens devem ser válidos."
+ *                   example: "Os item_ids devem ser válidos."
  *       404:
  *         description: Menu não encontrado.
  *         content:
@@ -266,7 +235,7 @@
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Erro ao adicionar itens ao menu."
+ *                   example: "Erro ao vincular itens ao menu."
  */
 
 /**
@@ -301,6 +270,7 @@
  *       200:
  *         description: Menu atualizado com sucesso.
  */
+
 /**
  * @swagger
  * /menus/{menu_id}:

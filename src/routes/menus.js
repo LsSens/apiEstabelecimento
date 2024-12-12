@@ -16,6 +16,6 @@ router.get("/:id", authenticateToken, getMenuById);
 router.post("/", authenticateToken, createMenu);
 router.put("/:id", authenticateToken, updateMenu);
 router.delete("/:id", authenticateToken, deleteMenu);
-router.post("/:menu_id/items", authenticateToken, addItemsToMenu);
+router.put("/:menu_id/items", authenticateToken, addItemsToMenu);
 
 module.exports = router;

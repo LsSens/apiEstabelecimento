@@ -182,7 +182,7 @@ const deleteMenu = async (req, res) => {
 
 const addItemsToMenu = async (req, res) => {
   const { menu_id } = req.params;
-  const { items } = req.body;
+  const { item_ids } = req.body;
   const { company_id } = req.user;
 
   try {
@@ -192,56 +192,38 @@ const addItemsToMenu = async (req, res) => {
       return res.status(404).json({ error: "Menu não encontrado." });
     }
 
-    if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: "Os itens devem ser válidos." });
+    if (!Array.isArray(item_ids) || item_ids.length === 0) {
+      return res.status(400).json({ error: "Os item_ids devem ser válidos." });
     }
 
     const associatedItems = [];
 
-    for (const item of items) {
-      const { name, price, available, image } = item;
-
-      if (
-        !name ||
-        typeof price !== "number" ||
-        typeof available !== "boolean"
-      ) {
-        return res.status(400).json({
-          error: "Item inválido. Campos obrigatórios: name, price, available.",
-        });
-      }
-
-      let existingItem = await Item.findOne({
-        where: { name, company_id },
-      });
+    for (const item_id of item_ids) {
+      const existingItem = await Item.findOne({ where: { id: item_id, company_id } });
 
       if (!existingItem) {
-        existingItem = await Item.create({
-          name,
-          price,
-          available,
-          image: image || null,
-          company_id,
-        });
+        return res.status(400).json({ error: `Item com ID ${item_id} não encontrado ou não pertence à sua empresa.` });
       }
 
-      await MenuItems.findOrCreate({
-        where: { menu_id, item_id: existingItem.id },
+      const [created] = await MenuItems.findOrCreate({
+        where: { menu_id, item_id },
       });
 
-      const itemToReturn = existingItem.toJSON();
-      delete itemToReturn.company_id;
-
-      associatedItems.push(itemToReturn);
+      if (created) {
+        associatedItems.push({
+          menu_id,
+          item_id,
+        });
+      }
     }
 
     res.status(201).json({
-      message: "Itens adicionados ao menu com sucesso.",
+      message: "Itens vinculados ao menu com sucesso.",
       items: associatedItems,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Erro ao adicionar itens ao menu." });
+    res.status(500).json({ error: "Erro ao vincular itens ao menu." });
   }
 };
 
