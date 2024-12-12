@@ -142,7 +142,7 @@ const createDelivery = async (req, res) => {
       company_id,
       total_cost,
       total_fee,
-      delivery_status: "PENDING",
+      delivery_status: "DELIVERING",
     });
 
     // Relacionar orders ao delivery na tabela delivery_orders
@@ -152,6 +152,12 @@ const createDelivery = async (req, res) => {
     }));
 
     await DeliveryOrder.bulkCreate(deliveryOrders);
+
+    // Atualizar status das orders para "DELIVERING"
+    await Order.update(
+      { status: "DELIVERING" },
+      { where: { id: orders } }
+    );
 
     // Retornar o delivery com as orders associadas
     const createdDelivery = await Delivery.findByPk(delivery.id, {
