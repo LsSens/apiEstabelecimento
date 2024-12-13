@@ -18,6 +18,7 @@ const getMenus = async (req, res) => {
           as: "items",
           attributes: ["id", "name", "price", "available"],
           through: { attributes: [] },
+          limit: 10,
         },
       ],
       order: [["menu_name", "ASC"]],
@@ -26,7 +27,7 @@ const getMenus = async (req, res) => {
         menu_id: menu.id,
         menu_name: menu.menu_name,
         menu_image: menu.image,
-        items: menu.items.slice(0, 3).map((item) => ({
+        items: menu.items.map((item) => ({
           item_id: item.id,
           name: item.name,
           price: item.price,
