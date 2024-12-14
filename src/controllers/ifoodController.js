@@ -1,5 +1,6 @@
 const axios = require('axios');
-const { IntegrationIfood } = require('../models');
+const { IntegrationIfood, IfoodOrder } = require('../models');
+const { createOrder } = require('./orderController');
 
 const urlIfood = process.env.IFOOD_API_URL
 const clientId = process.env.IFOOD_CLIENT_ID
@@ -116,11 +117,78 @@ const unlinkIfoodIntegration = async (req, res) => {
 const postWebHook = async (req, res) => {
     try {
         console.log(req.body);
-        return res.status(200).json({ message: "Webhook recebido com sucesso." });
+        const { code, merchantId, orderId } = req.body;
+
+        if (code !== 'PLC') {
+            return res.status(200).json({ message: "Evento ignorado." });
+        }
+
+        // Buscar integração pelo merchantId
+        const integration = await IntegrationIfood.findOne({
+            where: { merchant_id: merchantId },
+        });
+
+        if (!integration) {
+            return res.status(404).json({ message: "Integração não encontrada para o merchantId." });
+        }
+
+        const { access_token, company_id } = integration;
+
+        // Buscar detalhes do pedido no iFood
+        const ifoodOrderDetails = await axios.get(`${urlIfood}/v1.0/orders/${orderId}`, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+        });
+
+        const orderDetails = ifoodOrderDetails.data;
+
+        // Formatando os dados no formato esperado pelo createOrder
+        const formattedOrder = {
+            customer: {
+                name: orderDetails.customer.name,
+                email: orderDetails.customer.email || null,
+                address: {
+                    street: orderDetails.delivery.address.streetName,
+                    number: orderDetails.delivery.address.streetNumber,
+                    neighborhood: orderDetails.delivery.address.neighborhood,
+                    city: orderDetails.delivery.address.city,
+                    state: orderDetails.delivery.address.state,
+                    zip: orderDetails.delivery.address.postalCode,
+                },
+                phone: orderDetails.customer.phone || null,
+            },
+            items: orderDetails.items.map((item) => ({
+                item_id: item.externalCode,
+                quantity: item.quantity,
+            })),
+            total: orderDetails.totalValue,
+            payment_method: orderDetails.payments[0].method,
+            delivery_fee: orderDetails.delivery.fee.value,
+            notes: orderDetails.delivery.deliveryInstructions || "",
+            company_id,
+        };
+
+        // Chamar o createOrder diretamente com os dados formatados
+        req.body = formattedOrder;
+        req.user = { company_id };
+
+        const response = await createOrder(req, res);
+
+        // Registrar o pedido no ifood_orders
+        const createdOrder = response.json;
+        await IfoodOrder.create({
+            order_id: createdOrder.id,
+            ifood_id: orderDetails.displayId,
+        });
+
+        return res.status(200).json({ message: "Pedido processado com sucesso." });
     } catch (error) {
+        console.error("Erro ao processar webhook:", error);
         return res.status(500).json({ message: "Erro ao processar dados.", error: error.message });
     }
 };
+
 
 
 module.exports = {
