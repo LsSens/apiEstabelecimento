@@ -1,4 +1,5 @@
 const { Item } = require("../models");
+const uploadToImgur = require("../services/imgurService");
 const paginationService = require("../services/paginationService");
 
 const getItems = async (req, res) => {
@@ -69,11 +70,16 @@ const createItem = async (req, res) => {
       });
     }
 
+    let imageUrl;
+    if (image) {
+      imageUrl = await uploadToImgur(image);
+    }
+
     const newItem = await Item.create({
       name,
       price,
       available,
-      image: image || null,
+      image: imageUrl,
       description: description || null,
       company_id,
     });
@@ -107,10 +113,15 @@ const updateItem = async (req, res) => {
       return res.status(404).json({ error: "Item não encontrado." });
     }
 
+    let imageUrl = item.image;
+    if (image) {
+      imageUrl = await uploadToImgur(image);
+    }
+
     item.name = name || item.name;
     item.price = price !== undefined ? price : item.price;
     item.available = available !== undefined ? available : item.available;
-    item.image = image || item.image;
+    item.image = imageUrl;
     item.description = description || item.description;
 
     await item.save();

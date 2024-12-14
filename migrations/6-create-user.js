@@ -27,6 +27,10 @@ module.exports = {
       company_id: {
         type: Sequelize.INTEGER
       },
+      image: {
+        allowNull: true,
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

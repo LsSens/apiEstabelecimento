@@ -109,7 +109,7 @@ const createMenu = async (req, res) => {
         .json({ error: "Já existe um menu com esse nome." });
     }
 
-    let imageUrl = "";
+    let imageUrl;
     if (image) {
       imageUrl = await uploadToImgur(image);
     }
@@ -143,9 +143,14 @@ const updateMenu = async (req, res) => {
       return res.status(404).json({ error: "Menu não encontrado." });
     }
 
+    let imageUrl = menu.image;
+    if (image) {
+      imageUrl = await uploadToImgur(image);
+    }
+
     await menu.update({
       menu_name,
-      image,
+      image: imageUrl,
     });
 
     res.status(200).json({
