@@ -94,7 +94,18 @@ const unlinkIfoodIntegration = async (req, res) => {
     }
 };
 
+const postWebHook = async (req, res) => {
+    try {
+        console.log(req.body);
+        return res.status(200).json({ message: "Webhook recebido com sucesso." });
+    } catch (error) {
+        return res.status(500).json({ message: "Erro ao processar dados.", error: error.message });
+    }
+};
+
+
 module.exports = {
+    postWebHook,
     getAuthorizationCode,
     postGenerateToken,
     unlinkIfoodIntegration
