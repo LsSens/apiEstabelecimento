@@ -58,6 +58,9 @@
  *                         id:
  *                           type: integer
  *                           example: 1
+ *                         ifood_integration:
+ *                           type: boolean
+ *                           example: false
  *                         name:
  *                           type: string
  *                           example: Empresa Exemplo

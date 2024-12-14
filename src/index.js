@@ -11,6 +11,7 @@ const customersRoutes = require("./routes/customers");
 const deliveriesRoutes = require("./routes/deliveries");
 const ordersRoutes = require("./routes/orders");
 const menusRoutes = require("./routes/menus");
+const ifoodRoutes = require("./routes/ifood");
 const itemRoutes = require("./routes/items");
 const authRoutes = require("./routes/auth");
 
@@ -27,11 +28,12 @@ app.use(cors());
 app.use(express.json());
 
 // Configurar as rotas
-app.use("/api/customers", customersRoutes);
 app.use("/api/deliveries", deliveriesRoutes);
+app.use("/api/customers", customersRoutes);
 app.use("/api/orders", ordersRoutes);
 app.use("/api/orders", ordersRoutes);
 app.use("/api/menus", menusRoutes);
+app.use("/api/ifood", ifoodRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/auth", authRoutes);
 

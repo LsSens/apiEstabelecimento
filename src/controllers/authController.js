@@ -1,7 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User, Company } = require("../models");
+const { User, Company, IntegrationIfood } = require("../models");
 const transporter = require("../services/emailService");
+const { Op } = require("sequelize");
 
 const registerUser = async (req, res) => {
   const { email, password, name, phone, company } = req.body;
@@ -89,6 +90,20 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ error: "E-mail ou senha inválidos." });
     }
 
+    const ifoodIntegration = await IntegrationIfood.findOne({
+      where: {
+        company_id: user.company.id,
+        token_expires_at: {
+          [Op.gt]: new Date(),
+        },
+      },
+    });
+
+    const companyWithIntegrationStatus = {
+      ...user.company.toJSON(),
+      ifood_integration: !!ifoodIntegration,
+    };
+
     const expiresIn = 60 * 60;
 
     const token = jwt.sign(
@@ -106,7 +121,7 @@ const loginUser = async (req, res) => {
     return res.status(200).json({
       data: {
         ...userWithoutPassword,
-        company: user.company,
+        company: companyWithIntegrationStatus,
       },
       token,
       expiresIn,
