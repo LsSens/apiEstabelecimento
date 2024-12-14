@@ -135,7 +135,7 @@ const postWebHook = async (req, res) => {
         const { access_token, company_id } = integration;
 
         // Buscar detalhes do pedido no iFood
-        const ifoodOrderDetails = await axios.get(`${urlIfood}/v1.0/orders/${orderId}`, {
+        const ifoodOrderDetails = await axios.get(`${urlIfood}/order/v1.0/orders/${orderId}`, {
             headers: {
                 Authorization: `Bearer ${access_token}`,
             },
@@ -154,7 +154,7 @@ const postWebHook = async (req, res) => {
                     neighborhood: orderDetails.delivery.address.neighborhood,
                     city: orderDetails.delivery.address.city,
                     state: orderDetails.delivery.address.state,
-                    zip: orderDetails.delivery.address.postalCode,
+                    cep: orderDetails.delivery.address.postalCode,
                 },
                 phone: orderDetails.customer.phone || null,
             },
