@@ -15,15 +15,23 @@ module.exports = (sequelize, DataTypes) => {
 
   IfoodOrder.init(
     {
-      ifood_id: DataTypes.INTEGER,
-      order_id: DataTypes.INTEGER,
+      ifood_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+      },
+      order_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+      },
     },
     {
       sequelize,
       modelName: "IfoodOrder",
       tableName: "ifood_orders",
+      timestamps: true,
     }
   );
-
   return IfoodOrder;
 };
