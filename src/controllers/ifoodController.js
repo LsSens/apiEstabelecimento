@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { IntegrationIfood, IfoodOrder } = require('../models');
-const { createOrder } = require('./orderController');
+const { createOrder, createOrderLogic } = require('./orderController');
 
 const urlIfood = process.env.IFOOD_API_URL
 const clientId = process.env.IFOOD_CLIENT_ID
@@ -173,10 +173,9 @@ const postWebHook = async (req, res) => {
         req.body = formattedOrder;
         req.user = { company_id };
 
-        const response = await createOrder(req, res);
+        const createdOrder = await createOrderLogic(formattedOrder);
 
         // Registrar o pedido no ifood_orders
-        const createdOrder = response.json;
         await IfoodOrder.create({
             order_id: createdOrder.id,
             ifood_id: orderDetails.displayId,

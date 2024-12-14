@@ -193,4 +193,76 @@ const deleteOrder = async (req, res) => {
   }
 };
 
-module.exports = { getOrders, createOrder, deleteOrder };
+const createOrderLogic = async (orderData) => {
+  const { company_id, customer, items, total, payment_method, delivery_fee, notes } = orderData;
+
+  const companyExists = await Company.findByPk(company_id);
+  if (!companyExists) {
+    throw new Error("Empresa não encontrada.");
+  }
+
+  const existingCustomer = await Customer.findOne({
+    where: {
+      name: customer.name,
+      address: customer.address,
+    },
+  });
+
+  let customerId;
+  if (existingCustomer) {
+    customerId = existingCustomer.id;
+  } else {
+    const newCustomer = await Customer.create({
+      name: customer.name,
+      email: customer.email || null,
+      address: JSON.stringify(customer.address),
+      phone: customer.phone || null,
+    });
+    customerId = newCustomer.id;
+  }
+
+  const itemIds = items.map((item) => item.item_id);
+  const existingItems = await Item.findAll({
+    where: { id: itemIds, company_id },
+    attributes: ["id"],
+  });
+
+  const existingItemIds = existingItems.map((item) => item.id);
+  const invalidItems = itemIds.filter((id) => !existingItemIds.includes(id));
+
+  if (invalidItems.length > 0) {
+    throw new Error("Alguns itens não existem ou não pertencem à sua empresa.");
+  }
+
+  const order = await Order.create({
+    customer_id: customerId,
+    company_id,
+    total,
+    status: "PENDING",
+    payment_method,
+    delivery_fee,
+    notes,
+  });
+
+  if (items && items.length > 0) {
+    const orderItems = items.map((item) => ({
+      order_id: order.id,
+      item_id: item.item_id,
+      quantity: item.quantity,
+    }));
+
+    await OrderItems.bulkCreate(orderItems);
+  }
+
+  const customerCompanyExists = await CustomerCompany.findOne({
+    where: { customer_id: customerId, company_id },
+  });
+
+  if (!customerCompanyExists) {
+    await CustomerCompany.create({ customer_id: customerId, company_id });
+  }
+
+  return order;
+};
+
+module.exports = { getOrders, createOrder, deleteOrder, createOrderLogic };
