@@ -221,19 +221,36 @@ const createOrderLogic = async (orderData) => {
     customerId = newCustomer.id;
   }
 
-  const itemIds = items.map((item) => item.item_id);
-  const existingItems = await Item.findAll({
-    where: { id: itemIds, company_id },
-    attributes: ["id"],
-  });
+  // **Processar itens: verificar, criar ou usar existentes**
+  const processedItems = await Promise.all(
+    items.map(async (item) => {
+      // Verificar se o item já existe na empresa
+      const existingItem = await Item.findOne({
+        where: {
+          name: item.name,
+          company_id,
+        },
+      });
 
-  const existingItemIds = existingItems.map((item) => item.id);
-  const invalidItems = itemIds.filter((id) => !existingItemIds.includes(id));
+      if (existingItem) {
+        // Retornar o ID do item existente
+        return { item_id: existingItem.id, quantity: item.quantity };
+      }
 
-  if (invalidItems.length > 0) {
-    throw new Error("Alguns itens não existem ou não pertencem à sua empresa.");
-  }
+      // Criar o item se não existir
+      const newItem = await Item.create({
+        name: item.name,
+        price: item.price,
+        available: true,
+        company_id,
+      });
 
+      // Retornar o ID do item recém-criado
+      return { item_id: newItem.id, quantity: item.quantity };
+    })
+  );
+
+  // Criar o pedido
   const order = await Order.create({
     customer_id: customerId,
     company_id,
@@ -244,8 +261,9 @@ const createOrderLogic = async (orderData) => {
     notes,
   });
 
-  if (items && items.length > 0) {
-    const orderItems = items.map((item) => ({
+  // Associar os itens ao pedido
+  if (processedItems.length > 0) {
+    const orderItems = processedItems.map((item) => ({
       order_id: order.id,
       item_id: item.item_id,
       quantity: item.quantity,
