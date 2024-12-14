@@ -261,16 +261,16 @@ const createOrderLogic = async (orderData) => {
     notes,
   });
 
-  // Associar os itens ao pedido
-  if (processedItems.length > 0) {
-    const orderItems = processedItems.map((item) => ({
-      order_id: order.id,
-      item_id: item.item_id,
-      quantity: item.quantity,
-    }));
+  // // Associar os itens ao pedido
+  // if (processedItems.length > 0) {
+  //   const orderItems = processedItems.map((item) => ({
+  //     order_id: order.id,
+  //     item_id: item.item_id,
+  //     quantity: item.quantity,
+  //   }));
 
-    await OrderItems.bulkCreate(orderItems);
-  }
+  //   await OrderItems.bulkCreate(orderItems);
+  // }
 
   const customerCompanyExists = await CustomerCompany.findOne({
     where: { customer_id: customerId, company_id },
