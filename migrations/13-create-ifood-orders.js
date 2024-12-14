@@ -4,12 +4,6 @@ module.exports = {
             ifood_id: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                references: {
-                    model: "deliveries",
-                    key: "id",
-                },
-                onUpdate: "CASCADE",
-                onDelete: "CASCADE",
             },
             order_id: {
                 type: Sequelize.INTEGER,
