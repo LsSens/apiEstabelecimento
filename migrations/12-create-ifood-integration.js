@@ -36,6 +36,18 @@ module.exports = {
                     isDate: true,
                 }
             },
+            merchant_id: {
+                type: DataTypes.TEXT,
+                allowNull: false,
+            },
+            name: {
+                type: Sequelize.STRING,
+                allowNull: false,
+            },
+            corporateName: {
+                type: Sequelize.STRING,
+                allowNull: false,
+            },
             createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE,

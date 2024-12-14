@@ -8,7 +8,7 @@ const clientSecret = process.env.IFOOD_CLIENT_SECRET
 const getAuthorizationCode = async (req, res) => {
     try {
         const response = await axios.post(
-            urlIfood + "/oauth/userCode",
+            urlIfood + "/authentication/v1.0/oauth/userCode",
             { clientId },
             {
                 headers: {
@@ -40,7 +40,7 @@ const postGenerateToken = async (req, res) => {
     }
 
     try {
-        const response = await axios.post(urlIfood + "/oauth/token", {
+        const response = await axios.post(urlIfood + "/authentication/v1.0/oauth/token", {
             grantType: "authorization_code",
             clientId,
             clientSecret,
@@ -54,15 +54,33 @@ const postGenerateToken = async (req, res) => {
 
         const { accessToken, refreshToken, expiresIn } = response.data;
 
+        console.log(response.data)
+
+        const responseMerchant = await axios.get(urlIfood + "/merchant/v1.0/merchants", {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + accessToken
+            },
+        });
+
+
+        const { id, name, corporateName } = responseMerchant.data[0]
+
         let integration = await IntegrationIfood.findOne({ where: { company_id: company_id } });
 
         if (integration) {
+            integration.merchant_id = id;
+            integration.name = name;
+            integration.corporateName = corporateName;
             integration.access_token = accessToken;
             integration.refresh_token = refreshToken;
             integration.token_expires_at = new Date(Date.now() + expiresIn * 1000);
             await integration.save();
         } else {
             integration = await IntegrationIfood.create({
+                merchant_id: id,
+                name: name,
+                corporateName: corporateName,
                 company_id,
                 access_token: accessToken,
                 refresh_token: refreshToken,
@@ -72,6 +90,7 @@ const postGenerateToken = async (req, res) => {
 
         return res.status(200).json({ message: "Token gerado e salvo com sucesso!", integration });
     } catch (error) {
+        console.log(error.message)
         return res.status(500).json({ message: "Erro ao gerar o token.", error: error.message });
     }
 }
