@@ -16,7 +16,7 @@ const getMenus = async (req, res) => {
         {
           model: Item,
           as: "items",
-          attributes: ["id", "name", "price", "available"],
+          attributes: ["id", "name", "price", "available", "image", "description"],
           through: { attributes: [] },
         },
       ],
@@ -31,6 +31,8 @@ const getMenus = async (req, res) => {
           name: item.name,
           price: item.price,
           available: item.available,
+          image: item.image,
+          description: item.description
         })),
       }));
 
