@@ -234,6 +234,27 @@ const addItemsToMenu = async (req, res) => {
   }
 };
 
+const deleteItemFromMenu = async (req, res) => {
+  const { menu_id, item_id } = req.params;
+
+  try {
+    const result = await MenuItems.destroy({
+      where: { menu_id, item_id },
+    });
+
+    if (result === 0) {
+      return res.status(404).json({ error: "Menu ou Item não encontrado." });
+    }
+
+    res.status(200).json({
+      message: "Item desvinculado do menu com sucesso.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao desvincular o item do menu." });
+  }
+};
+
 module.exports = {
   getMenus,
   getMenuById,
@@ -241,4 +262,5 @@ module.exports = {
   updateMenu,
   deleteMenu,
   addItemsToMenu,
+  deleteItemFromMenu
 };

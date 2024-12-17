@@ -246,6 +246,61 @@
 
 /**
  * @swagger
+ * /menus/{menu_id}/items/{item_id}:
+ *   delete:
+ *     summary: Desvincula um item de um menu.
+ *     tags:
+ *       - Cardápio - Menus
+ *     parameters:
+ *       - name: menu_id
+ *         in: path
+ *         required: true
+ *         description: ID do menu do qual o item será desvinculado.
+ *         schema:
+ *           type: integer
+ *           example: 5
+ *       - name: item_id
+ *         in: path
+ *         required: true
+ *         description: ID do item que será desvinculado do menu.
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Item desvinculado do menu com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Item desvinculado do menu com sucesso.
+ *       404:
+ *         description: Menu ou Item não encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Menu ou Item não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erro ao desvincular o item do menu."
+ */
+
+/**
+ * @swagger
  * /menus/{menu_id}:
  *   put:
  *     summary: Atualiza informações de um menu do cardápio.
