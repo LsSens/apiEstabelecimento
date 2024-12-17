@@ -221,34 +221,34 @@ const createOrderLogic = async (orderData) => {
     customerId = newCustomer.id;
   }
 
-  // // **Processar itens: verificar, criar ou usar existentes**
-  // const processedItems = await Promise.all(
-  //   items.map(async (item) => {
-  //     // Verificar se o item já existe na empresa
-  //     const existingItem = await Item.findOne({
-  //       where: {
-  //         name: item.name,
-  //         company_id,
-  //       },
-  //     });
+  // **Processar itens: verificar, criar ou usar existentes**
+  const processedItems = await Promise.all(
+    items.map(async (item) => {
+      // Verificar se o item já existe na empresa
+      const existingItem = await Item.findOne({
+        where: {
+          name: item.name,
+          company_id,
+        },
+      });
 
-  //     if (existingItem) {
-  //       // Retornar o ID do item existente
-  //       return { item_id: existingItem.id, quantity: item.quantity };
-  //     }
+      if (existingItem) {
+        // Retornar o ID do item existente
+        return { item_id: existingItem.id, quantity: item.quantity };
+      }
 
-  //     // Criar o item se não existir
-  //     const newItem = await Item.create({
-  //       name: item.name,
-  //       price: item.price,
-  //       available: true,
-  //       company_id,
-  //     });
+      // Criar o item se não existir
+      const newItem = await Item.create({
+        name: item.name,
+        price: item.price,
+        available: true,
+        company_id,
+      });
 
-  //     // Retornar o ID do item recém-criado
-  //     return { item_id: newItem.id, quantity: item.quantity };
-  //   })
-  // );
+      // Retornar o ID do item recém-criado
+      return { item_id: newItem.id, quantity: item.quantity };
+    })
+  );
 
   // Criar o pedido
   const order = await Order.create({
@@ -261,16 +261,16 @@ const createOrderLogic = async (orderData) => {
     notes,
   });
 
-  // // Associar os itens ao pedido
-  // if (processedItems.length > 0) {
-  //   const orderItems = processedItems.map((item) => ({
-  //     order_id: order.id,
-  //     item_id: item.item_id,
-  //     quantity: item.quantity,
-  //   }));
+  // Associar os itens ao pedido
+  if (processedItems.length > 0) {
+    const orderItems = processedItems.map((item) => ({
+      order_id: order.id,
+      item_id: item.item_id,
+      quantity: item.quantity,
+    }));
 
-  //   await OrderItems.bulkCreate(orderItems);
-  // }
+    await OrderItems.bulkCreate(orderItems);
+  }
 
   const customerCompanyExists = await CustomerCompany.findOne({
     where: { customer_id: customerId, company_id },
