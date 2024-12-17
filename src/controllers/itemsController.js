@@ -1,17 +1,37 @@
-const { Item } = require("../models");
+const { Op } = require("sequelize");
+const { Item, MenuItems } = require("../models");
 const uploadToImgur = require("../services/imgurService");
 const paginationService = require("../services/paginationService");
 
 const getItems = async (req, res) => {
   const { company_id } = req.user;
+  const { menu_id } = req.query;
 
   if (!company_id) {
     return res.status(401).json({ error: "Acesso negado. Empresa não identificada." });
   }
 
   try {
+    let excludedItemIds = [];
+    if (menu_id) {
+      const linkedItems = await MenuItems.findAll({
+        where: { menu_id },
+        attributes: ["item_id"],
+      });
+      excludedItemIds = linkedItems.map((linkedItem) => linkedItem.item_id);
+    }
+
+    const whereCondition = {
+      company_id,
+    };
+
+    if (excludedItemIds.length > 0) {
+      whereCondition.id = { [Op.notIn]: excludedItemIds };
+    }
+
+
     await paginationService(Item, {
-      where: { company_id },
+      where: whereCondition,
       attributes: ["id", "name", "description", "price", "available", "image"],
     })(req, res, () => {
       const formattedItems = res.pagination.data.map((item) => ({

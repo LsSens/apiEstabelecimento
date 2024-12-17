@@ -71,6 +71,12 @@
  *                             available:
  *                               type: boolean
  *                               example: true
+ *                             description:
+ *                               type: string
+ *                               example: bebida gelada
+ *                             image:
+ *                               type: string
+ *                               example: https://example.com/item1.jpg
  *       500:
  *         description: Erro interno do servidor.
  */

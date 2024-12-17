@@ -3,6 +3,7 @@
  * /items:
  *   get:
  *     summary: Retorna todos os itens associados ao company_id do usuário autenticado.
+ *     description: Permite filtrar itens que não estão vinculados a um menu específico.
  *     tags:
  *       - Cardápio - Items
  *     parameters:
@@ -20,9 +21,16 @@
  *         schema:
  *           type: integer
  *           example: 10
+ *       - name: menu_id
+ *         in: query
+ *         description: ID do menu para filtrar os itens não vinculados.
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 5
  *     responses:
  *       200:
- *         description: Lista de itens associados ao company_id.
+ *         description: Lista de itens associados ao company_id, filtrando os não vinculados a um menu.
  *         content:
  *           application/json:
  *             schema:
@@ -53,7 +61,7 @@
  *                         example: Coca-Cola
  *                       description:
  *                         type: string
- *                         example: Very good
+ *                         example: Refrigerante de cola
  *                       price:
  *                         type: number
  *                         format: float
@@ -64,9 +72,12 @@
  *                       image:
  *                         type: string
  *                         example: https://example.com/image.png
+ *       401:
+ *         description: Acesso negado. Empresa não identificada.
  *       500:
  *         description: Erro ao buscar itens.
  */
+
 
 /**
  * @swagger
