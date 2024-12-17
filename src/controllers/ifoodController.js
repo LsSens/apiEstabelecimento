@@ -159,7 +159,7 @@ const postWebHook = async (req, res) => {
                 phone: orderDetails.customer.phone.number || null,
             },
             items: orderDetails.items.map((item) => ({
-                item_id: item.externalCode,
+                name: item.name,
                 quantity: item.quantity,
             })),
             total: orderDetails.total.subTotal,
