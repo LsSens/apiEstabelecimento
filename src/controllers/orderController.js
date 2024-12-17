@@ -215,7 +215,7 @@ const createOrderLogic = async (orderData) => {
     const newCustomer = await Customer.create({
       name: customer.name,
       email: customer.email || null,
-      address: JSON.stringify(customer.address),
+      address: customer.address,
       phone: customer.phone || null,
     });
     customerId = newCustomer.id;
