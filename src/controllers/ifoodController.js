@@ -160,6 +160,7 @@ const postWebHook = async (req, res) => {
             },
             items: orderDetails.items.map((item) => ({
                 name: item.name,
+                price: item.price,
                 quantity: item.quantity,
             })),
             total: orderDetails.total.subTotal,
