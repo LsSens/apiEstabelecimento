@@ -48,6 +48,9 @@
  *                       id:
  *                         type: integer
  *                         example: 9
+ *                       ifood_id:
+ *                         type: integer
+ *                         example: 1111
  *                       deliver_id:
  *                         type: integer
  *                         example: 19

@@ -41,6 +41,11 @@ const getOrders = async (req, res) => {
           as: "deliveryOrder",
           attributes: ["delivery_id"],
         },
+        {
+          model: IfoodOrder,
+          as: "ifoodOrder",
+          attributes: ["ifood_id"],
+        },
       ],
     })(req, res, () => {
       const formattedOrders = res.pagination.data.map((order) => {

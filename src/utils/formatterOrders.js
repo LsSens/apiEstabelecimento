@@ -1,6 +1,7 @@
 function formatterOrder(order) {
     return {
         id: order.id,
+        ifood_id: order.ifoodOrder?.ifood_id || null,
         customer_id: order.customer_id,
         customer: order.customer,
         total: order.total,

@@ -28,6 +28,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "order_id",
         as: "deliveryOrder",
       });
+
+      // Relacionamento com IfoodOrder
+      Order.hasOne(models.IfoodOrder, {
+        foreignKey: "order_id",
+        as: "ifoodOrder",
+      })
     }
   }
 
