@@ -20,6 +20,7 @@ const getOrders = async (req, res) => {
   try {
     await paginationService(Order, {
       where: { company_id },
+      order: [["id", "DESC"]],
       include: [
         {
           model: Item,
