@@ -246,29 +246,35 @@
 
 /**
  * @swagger
- * /menus/{menu_id}/items/{item_id}:
+ * /menus/{menu_id}/items:
  *   delete:
- *     summary: Desvincula um item de um menu.
+ *     summary: Desvincula múltiplos itens de um menu.
  *     tags:
  *       - Cardápio - Menus
  *     parameters:
  *       - name: menu_id
  *         in: path
  *         required: true
- *         description: ID do menu do qual o item será desvinculado.
+ *         description: ID do menu do qual os itens serão desvinculados.
  *         schema:
  *           type: integer
  *           example: 5
- *       - name: item_id
- *         in: path
- *         required: true
- *         description: ID do item que será desvinculado do menu.
- *         schema:
- *           type: integer
- *           example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               item_ids:
+ *                 type: array
+ *                 description: Lista de IDs dos itens que serão desvinculados do menu.
+ *                 items:
+ *                   type: integer
+ *                 example: [1, 2, 3]
  *     responses:
  *       200:
- *         description: Item desvinculado do menu com sucesso.
+ *         description: Itens desvinculados do menu com sucesso.
  *         content:
  *           application/json:
  *             schema:
@@ -276,9 +282,9 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Item desvinculado do menu com sucesso.
- *       404:
- *         description: Menu ou Item não encontrado.
+ *                   example: "3 item(s) desvinculado(s) do menu com sucesso."
+ *       400:
+ *         description: Requisição inválida.
  *         content:
  *           application/json:
  *             schema:
@@ -286,7 +292,17 @@
  *               properties:
  *                 error:
  *                   type: string
- *                   example: Menu ou Item não encontrado.
+ *                   example: "É necessário fornecer um array de item_ids válido."
+ *       404:
+ *         description: Nenhum item encontrado para o menu especificado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Nenhum item encontrado para o menu especificado."
  *       500:
  *         description: Erro interno do servidor.
  *         content:
@@ -296,7 +312,7 @@
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Erro ao desvincular o item do menu."
+ *                   example: "Erro ao desvincular os itens do menu."
  */
 
 /**

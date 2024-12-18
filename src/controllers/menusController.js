@@ -234,24 +234,32 @@ const addItemsToMenu = async (req, res) => {
   }
 };
 
-const deleteItemFromMenu = async (req, res) => {
-  const { menu_id, item_id } = req.params;
+const deleteItemsFromMenu = async (req, res) => {
+  const { menu_id } = req.params;
+  const { item_ids } = req.body;
+
+  if (!Array.isArray(item_ids) || item_ids.length === 0) {
+    return res.status(400).json({ error: "É necessário fornecer um array de item_ids válido." });
+  }
 
   try {
     const result = await MenuItems.destroy({
-      where: { menu_id, item_id },
+      where: {
+        menu_id,
+        item_id: item_ids,
+      },
     });
 
     if (result === 0) {
-      return res.status(404).json({ error: "Menu ou Item não encontrado." });
+      return res.status(404).json({ error: "Nenhum item encontrado para o menu especificado." });
     }
 
     res.status(200).json({
-      message: "Item desvinculado do menu com sucesso.",
+      message: `${result} item(s) desvinculado(s) do menu com sucesso.`,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Erro ao desvincular o item do menu." });
+    res.status(500).json({ error: "Erro ao desvincular os itens do menu." });
   }
 };
 
@@ -262,5 +270,5 @@ module.exports = {
   updateMenu,
   deleteMenu,
   addItemsToMenu,
-  deleteItemFromMenu
+  deleteItemsFromMenu
 };

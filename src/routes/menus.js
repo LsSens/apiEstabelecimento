@@ -6,7 +6,7 @@ const {
   updateMenu,
   deleteMenu,
   addItemsToMenu,
-  deleteItemFromMenu,
+  deleteItemsFromMenu,
 } = require("../controllers/menusController");
 const authenticateToken = require("../middlewares/authenticateToken");
 
@@ -18,6 +18,6 @@ router.post("/", authenticateToken, createMenu);
 router.put("/:id", authenticateToken, updateMenu);
 router.delete("/:id", authenticateToken, deleteMenu);
 router.put("/:menu_id/items", authenticateToken, addItemsToMenu);
-router.delete("/:menu_id/items/:item_id", authenticateToken, deleteItemFromMenu);
+router.delete("/:menu_id/items", authenticateToken, deleteItemsFromMenu);
 
 module.exports = router;
