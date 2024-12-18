@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { IntegrationIfood, IfoodOrder } = require('../models');
-const { createOrder, createOrderLogic } = require('./orderController');
+const { createOrderLogic } = require('./orderController');
+const IfoodService = require('../services/ifoodService');
 
 const urlIfood = process.env.IFOOD_API_URL
 const clientId = process.env.IFOOD_CLIENT_ID
@@ -124,9 +125,7 @@ const postWebHook = async (req, res) => {
         }
 
         // Buscar integração pelo merchantId
-        const integration = await IntegrationIfood.findOne({
-            where: { merchant_id: merchantId },
-        });
+        const integration = await IfoodService.getIntegrationByMerchant(merchantId);
 
         if (!integration) {
             return res.status(404).json({ message: "Integração não encontrada para o merchantId." });
@@ -135,57 +134,16 @@ const postWebHook = async (req, res) => {
         const { access_token, company_id } = integration;
 
         // Buscar detalhes do pedido no iFood
-        const ifoodOrderDetails = await axios.get(`${urlIfood}/order/v1.0/orders/${orderId}`, {
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-            },
-        });
+        const orderDetails = await ifoodService.fetchOrderDetails(orderId, access_token);
 
-        const orderDetails = ifoodOrderDetails.data;
+        // Formatando os dados no formato esperado
+        const formattedOrder = IfoodService.formatOrderDetails(orderDetails, company_id);
 
-        // Formatando os dados no formato esperado pelo createOrder
-        const formattedOrder = {
-            customer: {
-                name: orderDetails.customer.name,
-                email: orderDetails.customer.email || null,
-                address: {
-                    street: orderDetails.delivery.deliveryAddress.streetName,
-                    number: orderDetails.delivery.deliveryAddress.streetNumber,
-                    city: orderDetails.delivery.deliveryAddress.city,
-                    state: orderDetails.delivery.deliveryAddress.state,
-                    cep: orderDetails.delivery.deliveryAddress.postalCode,
-                    lat: orderDetails.delivery.deliveryAddress.coordinates.latitude,
-                    lng: orderDetails.delivery.deliveryAddress.coordinates.longitude,
-                    neighborhood: orderDetails.delivery.deliveryAddress.neighborhood,
-                    complement: orderDetails.delivery.deliveryAddress.complement,
-                },
-                phone: orderDetails.customer.phone.number || null,
-            },
-            items: orderDetails.items.map((item) => ({
-                name: item.name,
-                price: item.price,
-                description: item.observations,
-                image: item.imageUrl,
-                quantity: item.quantity,
-            })),
-            total: orderDetails.total.subTotal,
-            payment_method: orderDetails.payments.methods[0].type,
-            delivery_fee: orderDetails.total.deliveryFee,
-            notes: orderDetails.delivery.description || "",
-            company_id,
-        };
-
-        // Chamar o createOrder diretamente com os dados formatados
-        req.body = formattedOrder;
-        req.user = { company_id };
-
+        // Criação do pedido no sistema
         const createdOrder = await createOrderLogic(formattedOrder);
 
-        // Registrar o pedido no ifood_orders
-        await IfoodOrder.create({
-            order_id: createdOrder.id,
-            ifood_id: orderDetails.displayId,
-        });
+        // Salvar no banco o pedido relacionado ao iFood
+        await IfoodService.saveIfoodOrder(createdOrder.id, orderDetails.displayId);
 
         return res.status(200).json({ message: "Pedido processado com sucesso." });
     } catch (error) {
@@ -193,8 +151,6 @@ const postWebHook = async (req, res) => {
         return res.status(500).json({ message: "Erro ao processar dados.", error: error.message });
     }
 };
-
-
 
 module.exports = {
     postWebHook,
