@@ -1,4 +1,4 @@
-const { Customer, CustomerCompany } = require("../models");
+const { Customer, CustomerCompany, Order } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const paginationService = require("../services/paginationService");
@@ -28,9 +28,26 @@ const getCustomersByCompany = async (req, res) => {
           ],
         },
       ],
-    })(req, res, () => {
-      const customers = res.pagination.data.map((relation) => relation.customer);
+    })(req, res, async () => {
+      const customers = await Promise.all(
+        res.pagination.data.map(async (relation) => {
+          const customer = relation.customer;
 
+          const orders = await Order.findAll({
+            where: { customer_id: customer.id, company_id },
+            attributes: ["id", "total", "status", "createdAt"],
+            order: [["createdAt", "DESC"]],
+            limit: 3,
+          });
+
+          return {
+            ...customer,
+            orders,
+          };
+        })
+      );
+
+      // Retornando os dados paginados
       res.status(200).json({
         currentPage: res.pagination.currentPage,
         totalPages: res.pagination.totalPages,
@@ -40,9 +57,9 @@ const getCustomersByCompany = async (req, res) => {
       });
     });
   } catch (error) {
-    console.error("Erro ao buscar clientes:", error);
+    console.error("Erro ao buscar clientes e pedidos:", error);
     res.status(500).json({
-      error: "Erro ao buscar clientes relacionados à empresa.",
+      error: "Erro ao buscar clientes e pedidos relacionados à empresa.",
     });
   }
 };
