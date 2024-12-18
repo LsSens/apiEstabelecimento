@@ -5,9 +5,12 @@ const {
   Company,
   OrderItems,
   CustomerCompany,
-  DeliveryOrder
+  DeliveryOrder,
+  IfoodOrder,
+  IntegrationIfood
 } = require("../models");
 const paginationService = require("../services/paginationService");
+const IfoodService = require('../services/ifoodService');
 const { formatterOrder } = require("../utils/formatterOrders");
 
 const getOrders = async (req, res) => {
@@ -180,6 +183,31 @@ const deleteOrder = async (req, res) => {
 
     if (!order) {
       return res.status(404).json({ error: "Pedido não encontrado." });
+    }
+
+    const ifoodOrder = await IfoodOrder.findOne({ where: { order_id: orderId } });
+
+    if (ifoodOrder) {
+      const integration = await IntegrationIfood.findOne({ where: { company_id } });
+
+      if (!integration) {
+        return res.status(400).json({ error: "Integração com iFood não encontrada." });
+      }
+
+      const accessToken = integration.access_token;
+      const ifoodOrderId = ifoodOrder.ifood_order_id;
+
+      try {
+        await IfoodService.cancelOrder(
+          ifoodOrderId,
+          "Pedido cancelado pelo estabelecimento",
+          501,
+          accessToken
+        );
+      } catch (error) {
+        console.error("Erro ao cancelar pedido no iFood:", error);
+        return res.status(500).json({ error: "Erro ao cancelar pedido no iFood." });
+      }
     }
 
     await order.update({

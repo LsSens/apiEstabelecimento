@@ -93,6 +93,28 @@ class IfoodService {
             ifood_order_id: ifoodOrderId
         });
     }
+
+    async cancelOrder(orderId, reason, cancellationCode, accessToken) {
+        try {
+            const response = await axios.post(
+                `${this.baseUrl}/order/v1.0/orders/${orderId}/requestCancellation`,
+                {
+                    reason,
+                    cancellationCode: String(cancellationCode),
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            return response.data;
+        } catch (error) {
+            console.error(`Error cancelling order for orderId: ${orderId}`, error.response?.data || error.message);
+            throw new Error("Failed to cancel order.");
+        }
+    }
 }
 
 module.exports = new IfoodService();
