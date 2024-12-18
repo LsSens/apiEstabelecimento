@@ -2,7 +2,7 @@
  * @swagger
  * /customers:
  *   get:
- *     summary: Lista todos os clientes relacionados a uma empresa.
+ *     summary: Lista todos os clientes relacionados a uma empresa, incluindo os últimos 3 pedidos de cada cliente.
  *     tags:
  *       - Clientes
  *     parameters:
@@ -76,6 +76,26 @@
  *                         type: string
  *                         format: date-time
  *                         example: "2024-12-10T00:00:00.000Z"
+ *                       orders:
+ *                         type: array
+ *                         description: Lista dos últimos 3 pedidos do cliente.
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: integer
+ *                               example: 101
+ *                             total:
+ *                               type: number
+ *                               format: float
+ *                               example: 150.75
+ *                             status:
+ *                               type: string
+ *                               example: "completed"
+ *                             createdAt:
+ *                               type: string
+ *                               format: date-time
+ *                               example: "2024-12-10T10:00:00.000Z"
  *       401:
  *         description: Token inválido ou não fornecido.
  *         content:
@@ -97,6 +117,7 @@
  *                   type: string
  *                   example: Erro ao buscar clientes relacionados à empresa.
  */
+
 
 /**
  * @swagger
