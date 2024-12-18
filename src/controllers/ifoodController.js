@@ -1,7 +1,7 @@
 const axios = require('axios');
-const { IntegrationIfood, IfoodOrder } = require('../models');
+const { IntegrationIfood } = require('../models');
 const { createOrderLogic } = require('./orderController');
-const IfoodService = require('../services/ifoodService');
+const { IfoodService } = require('../services/ifoodService');
 
 const urlIfood = process.env.IFOOD_API_URL
 const clientId = process.env.IFOOD_CLIENT_ID
@@ -117,7 +117,6 @@ const unlinkIfoodIntegration = async (req, res) => {
 
 const postWebHook = async (req, res) => {
     try {
-        console.log(req.body);
         const { code, merchantId, orderId } = req.body;
 
         if (code !== 'PLC') {
@@ -134,7 +133,7 @@ const postWebHook = async (req, res) => {
         const { access_token, company_id } = integration;
 
         // Buscar detalhes do pedido no iFood
-        const orderDetails = await ifoodService.fetchOrderDetails(orderId, access_token);
+        const orderDetails = await IfoodService.fetchOrderDetails(orderId, access_token);
 
         // Formatando os dados no formato esperado
         const formattedOrder = IfoodService.formatOrderDetails(orderDetails, company_id);
