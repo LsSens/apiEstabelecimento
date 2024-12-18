@@ -118,7 +118,6 @@
  *                   example: Erro ao buscar clientes relacionados à empresa.
  */
 
-
 /**
  * @swagger
  * /customers/login:

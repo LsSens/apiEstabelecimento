@@ -8,8 +8,6 @@ const paginationService = (model, options = {}) => async (req, res, next) => {
             ...options,
             limit,
             offset,
-            raw: true,
-            nest: true,
         });
 
         const totalPages = Math.ceil(count / limit);

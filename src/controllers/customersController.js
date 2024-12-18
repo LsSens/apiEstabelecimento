@@ -41,7 +41,7 @@ const getCustomersByCompany = async (req, res) => {
           });
 
           return {
-            ...customer,
+            ...customer.get({ plain: true }),
             orders,
           };
         })
