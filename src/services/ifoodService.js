@@ -3,19 +3,47 @@ const { IntegrationIfood, IfoodOrder } = require('../models');
 
 class IfoodService {
     constructor() {
-        this.urlIfood = process.env.IFOOD_API_URL;
+        this.baseUrl = process.env.IFOOD_API_URL;
+        this.clientId = process.env.IFOOD_CLIENT_ID;
+        this.clientSecret = process.env.IFOOD_CLIENT_SECRET;
     }
 
-    // Busca a integração do merchantId
-    async getIntegrationByMerchant(merchantId) {
-        return await IntegrationIfood.findOne({ where: { merchant_id: merchantId } });
+    async getAuthorizationCode() {
+        const response = await axios.post(
+            `${this.baseUrl}/authentication/v1.0/oauth/userCode`,
+            { clientId: this.clientId },
+            { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+        );
+        return response.data;
     }
 
-    // Busca os detalhes do pedido no iFood
-    async fetchOrderDetails(orderId, accessToken) {
-        const response = await axios.get(`${this.urlIfood}/order/v1.0/orders/${orderId}`, {
+    async generateToken(authorizationCode, authorizationCodeVerifier) {
+        const response = await axios.post(
+            `${this.baseUrl}/authentication/v1.0/oauth/token`,
+            {
+                grantType: "authorization_code",
+                clientId: this.clientId,
+                clientSecret: this.clientSecret,
+                authorizationCode,
+                authorizationCodeVerifier,
+            },
+            { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+        );
+        return response.data;
+    }
+
+    async fetchMerchants(accessToken) {
+        const response = await axios.get(`${this.baseUrl}/merchant/v1.0/merchants`, {
             headers: { Authorization: `Bearer ${accessToken}` },
         });
+        return response.data[0];
+    }
+
+    async fetchOrderDetails(orderId, accessToken) {
+        const response = await axios.get(
+            `${this.baseUrl}/order/v1.0/orders/${orderId}`,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
         return response.data;
     }
 
@@ -51,6 +79,11 @@ class IfoodService {
             notes: orderDetails.delivery.description || "",
             company_id,
         };
+    }
+
+    // Busca a integração do merchantId
+    async getIntegrationByMerchant(merchantId) {
+        return await IntegrationIfood.findOne({ where: { merchant_id: merchantId } });
     }
 
     async saveIfoodOrder(orderId, ifoodId) {

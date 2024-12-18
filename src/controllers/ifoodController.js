@@ -1,33 +1,11 @@
-const axios = require('axios');
-const { IntegrationIfood } = require('../models');
+const IfoodService = require('../services/ifoodService');
 const { createOrderLogic } = require('./orderController');
-const { IfoodService } = require('../services/ifoodService');
-
-const urlIfood = process.env.IFOOD_API_URL
-const clientId = process.env.IFOOD_CLIENT_ID
-const clientSecret = process.env.IFOOD_CLIENT_SECRET
+const { IntegrationIfood } = require('../models');
 
 const getAuthorizationCode = async (req, res) => {
     try {
-        const response = await axios.post(
-            urlIfood + "/authentication/v1.0/oauth/userCode",
-            { clientId },
-            {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            }
-        );
-
-        const { userCode, authorizationCodeVerifier, verificationUrl, verificationUrlComplete, expiresIn } = response.data;
-
-        return res.status(200).json({
-            userCode,
-            authorizationCodeVerifier,
-            verificationUrl,
-            verificationUrlComplete,
-            expiresIn,
-        });
+        const result = await IfoodService.getAuthorizationCode();
+        return res.status(200).json(result);
     } catch (error) {
         return res.status(500).json({ message: "Erro ao gerar o código de autenticação.", error: error.message });
     }
@@ -42,60 +20,46 @@ const postGenerateToken = async (req, res) => {
     }
 
     try {
-        const response = await axios.post(urlIfood + "/authentication/v1.0/oauth/token", {
-            grantType: "authorization_code",
-            clientId,
-            clientSecret,
-            authorizationCode,
-            authorizationCodeVerifier,
-        }, {
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
+        const tokenData = await IfoodService.generateToken(authorizationCode, authorizationCodeVerifier);
+        const { accessToken, refreshToken, expiresIn } = tokenData;
+
+        const merchant = await IfoodService.fetchMerchants(accessToken);
+        const integration = await IntegrationIfood.upsert({
+            company_id,
+            merchant_id: merchant.id,
+            name: merchant.name,
+            corporateName: merchant.corporateName,
+            access_token: accessToken,
+            refresh_token: refreshToken,
+            token_expires_at: new Date(Date.now() + expiresIn * 1000),
         });
-
-        const { accessToken, refreshToken, expiresIn } = response.data;
-
-        console.log(response.data)
-
-        const responseMerchant = await axios.get(urlIfood + "/merchant/v1.0/merchants", {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + accessToken
-            },
-        });
-
-
-        const { id, name, corporateName } = responseMerchant.data[0]
-
-        let integration = await IntegrationIfood.findOne({ where: { company_id: company_id } });
-
-        if (integration) {
-            integration.merchant_id = id;
-            integration.name = name;
-            integration.corporateName = corporateName;
-            integration.access_token = accessToken;
-            integration.refresh_token = refreshToken;
-            integration.token_expires_at = new Date(Date.now() + expiresIn * 1000);
-            await integration.save();
-        } else {
-            integration = await IntegrationIfood.create({
-                merchant_id: id,
-                name: name,
-                corporateName: corporateName,
-                company_id,
-                access_token: accessToken,
-                refresh_token: refreshToken,
-                token_expires_at: new Date(Date.now() + expiresIn * 1000),
-            });
-        }
 
         return res.status(200).json({ message: "Token gerado e salvo com sucesso!", integration });
     } catch (error) {
-        console.log(error.message)
         return res.status(500).json({ message: "Erro ao gerar o token.", error: error.message });
     }
-}
+};
+
+const postWebHook = async (req, res) => {
+    try {
+        const { code, merchantId, orderId } = req.body;
+
+        if (code !== 'PLC') {
+            return res.status(200).json({ message: "Evento ignorado." });
+        }
+
+        const integration = await IfoodService.getIntegrationByMerchant(merchantId);
+        const orderDetails = await IfoodService.fetchOrderDetails(orderId, integration.access_token);
+        const formattedOrder = IfoodService.formatOrderDetails(orderDetails, integration.company_id);
+
+        const createdOrder = await createOrderLogic(formattedOrder);
+        await IfoodService.saveIfoodOrder(createdOrder.id, orderDetails.displayId);
+
+        return res.status(200).json({ message: "Pedido processado com sucesso." });
+    } catch (error) {
+        return res.status(500).json({ message: "Erro ao processar webhook.", error: error.message });
+    }
+};
 
 const unlinkIfoodIntegration = async (req, res) => {
     try {
@@ -115,45 +79,9 @@ const unlinkIfoodIntegration = async (req, res) => {
     }
 };
 
-const postWebHook = async (req, res) => {
-    try {
-        const { code, merchantId, orderId } = req.body;
-
-        if (code !== 'PLC') {
-            return res.status(200).json({ message: "Evento ignorado." });
-        }
-
-        // Buscar integração pelo merchantId
-        const integration = await IfoodService.getIntegrationByMerchant(merchantId);
-
-        if (!integration) {
-            return res.status(404).json({ message: "Integração não encontrada para o merchantId." });
-        }
-
-        const { access_token, company_id } = integration;
-
-        // Buscar detalhes do pedido no iFood
-        const orderDetails = await IfoodService.fetchOrderDetails(orderId, access_token);
-
-        // Formatando os dados no formato esperado
-        const formattedOrder = IfoodService.formatOrderDetails(orderDetails, company_id);
-
-        // Criação do pedido no sistema
-        const createdOrder = await createOrderLogic(formattedOrder);
-
-        // Salvar no banco o pedido relacionado ao iFood
-        await IfoodService.saveIfoodOrder(createdOrder.id, orderDetails.displayId);
-
-        return res.status(200).json({ message: "Pedido processado com sucesso." });
-    } catch (error) {
-        console.error("Erro ao processar webhook:", error);
-        return res.status(500).json({ message: "Erro ao processar dados.", error: error.message });
-    }
-};
-
 module.exports = {
-    postWebHook,
     getAuthorizationCode,
     postGenerateToken,
-    unlinkIfoodIntegration
+    postWebHook,
+    unlinkIfoodIntegration,
 };
