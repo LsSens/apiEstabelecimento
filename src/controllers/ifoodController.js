@@ -53,7 +53,7 @@ const postWebHook = async (req, res) => {
         const formattedOrder = IfoodService.formatOrderDetails(orderDetails, integration.company_id);
 
         const createdOrder = await createOrderLogic(formattedOrder);
-        await IfoodService.saveIfoodOrder(createdOrder.id, orderDetails.displayId);
+        await IfoodService.saveIfoodOrder(createdOrder.id, orderDetails.displayId, orderDetails.id);
 
         return res.status(200).json({ message: "Pedido processado com sucesso." });
     } catch (error) {

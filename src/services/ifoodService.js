@@ -86,10 +86,11 @@ class IfoodService {
         return await IntegrationIfood.findOne({ where: { merchant_id: merchantId } });
     }
 
-    async saveIfoodOrder(orderId, ifoodId) {
+    async saveIfoodOrder(orderId, ifoodId, ifoodOrderId) {
         return await IfoodOrder.create({
             order_id: orderId,
             ifood_id: ifoodId,
+            ifood_order_id: ifoodOrderId
         });
     }
 }

@@ -25,6 +25,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         primaryKey: true,
       },
+      ifood_order_id: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        primaryKey: true,
+      },
     },
     {
       sequelize,
