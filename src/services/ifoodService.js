@@ -99,7 +99,7 @@ class IfoodService {
             const response = await axios.post(
                 `${this.baseUrl}/order/v1.0/orders/${orderId}/requestCancellation`,
                 {
-                    reason,
+                    reason: reason,
                     cancellationCode: String(cancellationCode),
                 },
                 {
@@ -113,6 +113,35 @@ class IfoodService {
         } catch (error) {
             console.error(`Error cancelling order for orderId: ${orderId}`, error.response?.data || error.message);
             throw new Error("Failed to cancel order.");
+        }
+    }
+
+    async startPreparationOrder(orderId, accessToken) {
+        try {
+            await axios.post(
+                `${this.baseUrl}/order/v1.0/orders/${orderId}/confirm`, {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            const response = await axios.post(
+                `${this.baseUrl}/order/v1.0/orders/${orderId}/startPreparation`, {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            return response.data;
+        } catch (error) {
+            console.error(`Error Start Preparation Order for orderId: ${orderId}`, error.response?.data || error.message);
+            throw new Error("Failed to start preparation order.");
         }
     }
 }

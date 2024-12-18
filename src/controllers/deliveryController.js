@@ -1,6 +1,7 @@
-const { Delivery, DeliveryOrder, Order, Item, Customer } = require("../models");
+const { Delivery, DeliveryOrder, Order, Item, Customer, IfoodOrder, IntegrationIfood } = require("../models");
 const paginationService = require("../services/paginationService");
 const { formatterDelivery } = require("../utils/formatterDeliveries");
+const IfoodService = require('../services/ifoodService');
 
 const getDeliveriesByCompany = async (req, res) => {
   const { company_id } = req.user;
@@ -153,6 +154,24 @@ const createDelivery = async (req, res) => {
       });
     }
 
+    // LOGICA PARA PEDIDOS DO IFOOD
+    await Promise.all(
+      orders.map(async (orderId) => {
+        const ifoodOrder = await IfoodOrder.findOne({ where: { order_id: orderId } });
+        if (ifoodOrder) {
+          const integration = await IntegrationIfood.findOne({ where: { company_id } });
+          if (!integration) {
+            throw new Error(`Integração com iFood não encontrada para a empresa ${company_id}.`);
+          }
+
+          const accessToken = integration.access_token;
+          const ifoodOrderId = ifoodOrder.ifood_order_id;
+          await IfoodService.startPreparationOrder(ifoodOrderId, accessToken);
+        }
+      })
+    );
+    //
+
     // Criar o delivery
     const delivery = await Delivery.create({
       company_id,
@@ -233,6 +252,29 @@ const cancelDelivery = async (req, res) => {
     if (!delivery) {
       return res.status(404).json({ error: "Delivery não encontrado." });
     }
+
+    // LOGICA PARA PEDIDOS DO IFOOD
+    await Promise.all(
+      delivery.orders.map(async (order) => {
+        try {
+          const ifoodOrder = await IfoodOrder.findOne({ where: { order_id: order.id } });
+          if (ifoodOrder) {
+            const integration = await IntegrationIfood.findOne({ where: { company_id } });
+            if (!integration) {
+              throw new Error(`Integração com iFood não encontrada para a empresa ${company_id}.`);
+            }
+
+            const accessToken = integration.access_token;
+            const ifoodOrderId = ifoodOrder.ifood_order_id;
+            await IfoodService.cancelOrder(ifoodOrderId, "Cancelado pelo estabelecimento", 501, accessToken);
+          }
+        } catch (error) {
+          console.error(`Erro ao cancelar pedido no iFood para orderId: ${order.id}`, error);
+          throw new Error(`Erro ao cancelar pedido no iFood para orderId: ${order.id}`, error);
+        }
+      })
+    );
+    //
 
     await Delivery.update(
       { delivery_status: "CANCELED", deletedAt: new Date() },

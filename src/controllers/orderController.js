@@ -185,6 +185,8 @@ const deleteOrder = async (req, res) => {
       return res.status(404).json({ error: "Pedido não encontrado." });
     }
 
+
+    // LOGICA PARA PEDIDOS DO IFOOD
     const ifoodOrder = await IfoodOrder.findOne({ where: { order_id: orderId } });
 
     if (ifoodOrder) {
@@ -209,6 +211,7 @@ const deleteOrder = async (req, res) => {
         return res.status(500).json({ error: "Erro ao cancelar pedido no iFood." });
       }
     }
+    //
 
     await order.update({
       status: "CANCELED",
